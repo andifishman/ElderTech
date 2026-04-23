@@ -1,7 +1,9 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# dependencies
+# dependencies (lo más pesado)
 node_modules/
+.pnp
+.pnp.js
 
 # Expo
 .expo/
@@ -9,35 +11,62 @@ dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# Native builds (generados por prebuild, pesan mucho)
+/android/
+/ios/
 .kotlin/
+
+# Metro bundler
+.metro-health-check*
+metro-cache/
+
+# Build outputs
+build/
+*.apk
+*.aab
+*.ipa
+*.app
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Env files (seguridad)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Keys y certificados (seguridad)
 *.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+*.keystore
+google-services.json
+GoogleService-Info.plist
 
 # macOS
 .DS_Store
-*.pem
+.AppleDouble
+.LSOverride
 
-# local env files
-.env*.local
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 
-app-example
+# Editor
+.vscode/settings.json
+.idea/
 
-# generated native folders
-/ios
-/android
+# Carpetas generadas por scripts
+app-example/
