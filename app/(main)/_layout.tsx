@@ -15,6 +15,8 @@ export default function MainLayout() {
       <Stack.Screen name="mas" />
       <Stack.Screen name="juegos" />
       <Stack.Screen name="juegos/memotest" />
+      <Stack.Screen name="clima" />
+      <Stack.Screen name="radio" />
     </Stack>
   );
 }

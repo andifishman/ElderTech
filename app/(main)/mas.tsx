@@ -1,10 +1,13 @@
+import AppHeader from '@/components/ui/AppHeader';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
 
 export default function MasScreen() {
   const router = useRouter();
@@ -15,20 +18,23 @@ export default function MasScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* Clima */}
-        <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/clima' as any)}
+        >
           <View style={[styles.iconBox, { backgroundColor: Colors.cyanLight }]}>
             <Text style={styles.icon}>🌤️</Text>
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Clima</Text>
             <Text style={styles.cardSub}>Consultá el clima del día</Text>
-            <Text style={styles.weatherText}>27°C, Soleado</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
-        </View>
+        </TouchableOpacity>
 
         {/* Radio */}
-        <TouchableOpacity style={styles.card} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={() => router.push('/(main)/radio' as any)}>
           <View style={[styles.iconBox, { backgroundColor: Colors.orangeLight }]}>
             <Text style={styles.icon}>📻</Text>
           </View>
@@ -84,7 +90,6 @@ const styles = StyleSheet.create({
   cardInfo: { flex: 1 },
   cardTitle: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary },
   cardSub: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 2 },
-  weatherText: { fontSize: FontSizes.lg, fontWeight: '600', color: Colors.primary, marginTop: 4 },
   arrow: { fontSize: 28, color: Colors.textLight, fontWeight: 'bold' },
   backBtn: {
     backgroundColor: Colors.primaryDark, borderRadius: Radius.sm,
