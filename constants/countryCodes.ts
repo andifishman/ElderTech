@@ -4,6 +4,17 @@ export interface CountryCode {
   code: string;
 }
 
+export const COMMON_COUNTRY_CODES = ['AR', 'US', 'IL', 'ES'];
+
+// Convierte un código ISO de 2 letras en el emoji de bandera correspondiente
+export function getFlagEmoji(countryCode: string): string {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map((char) => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
 export const COUNTRY_CODES: CountryCode[] = [
   { name: "Afghanistan", dial_code: "+93", code: "AF" },
   { name: "Aland Islands", dial_code: "+358", code: "AX" },

@@ -1,16 +1,18 @@
 import AppHeader from '@/components/ui/AppHeader';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useContacts } from '@/context/ContactsContext';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert, Modal,
+    Alert,
+    Modal,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 export default function LlamarScreen() {
@@ -57,7 +59,11 @@ export default function LlamarScreen() {
         {filtered.map((contact) => (
           <View key={contact.id} style={styles.contactCard}>
             <View style={styles.avatarBox}>
-              <Text style={styles.avatarText}>{contact.name.charAt(0)}</Text>
+              {contact.avatar ? (
+                <Image source={{ uri: contact.avatar }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarText}>{contact.name.charAt(0)}</Text>
+              )}
             </View>
             <View style={styles.contactInfo}>
               <Text style={styles.contactName}>{contact.name}</Text>
@@ -135,7 +141,9 @@ const styles = StyleSheet.create({
     width: 44, height: 44, borderRadius: 22,
     backgroundColor: Colors.primaryLight, alignItems: 'center',
     justifyContent: 'center', marginRight: Spacing.sm,
+    overflow: 'hidden',
   },
+  avatarImage: { width: 44, height: 44, borderRadius: 22 },
   avatarText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.lg },
   contactInfo: { flex: 1, minWidth: 100 },
   contactName: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.textPrimary },

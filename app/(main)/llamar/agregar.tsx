@@ -1,16 +1,18 @@
 import AppHeader from '@/components/ui/AppHeader';
-import { COUNTRY_CODES, CountryCode } from '@/constants/countryCodes';
+import { COMMON_COUNTRY_CODES, COUNTRY_CODES, CountryCode, getFlagEmoji } from '@/constants/countryCodes';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useContacts } from '@/context/ContactsContext';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text, TextInput, TouchableOpacity,
-  View
+    Alert,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text, TextInput, TouchableOpacity,
+    View
 } from 'react-native';
 
 const RELATIONS = ['Hijo/a', 'Nieto/a', 'Médico', 'Amigo', 'Otra...'];
@@ -23,9 +25,15 @@ export default function AgregarContactoScreen() {
   const [countryCode, setCountryCode] = useState('+54');
   const [relation, setRelation] = useState('');
   const [customRelation, setCustomRelation] = useState('');
+  const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCustomRelation, setShowCustomRelation] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
+
+  const commonCountries = useMemo(
+    () => COUNTRY_CODES.filter((c) => COMMON_COUNTRY_CODES.includes(c.code)),
+    []
+  );
 
   // Filtrar países según la búsqueda
   const filteredCountries = useMemo(() => {
@@ -40,10 +48,32 @@ export default function AgregarContactoScreen() {
     );
   }, [countrySearch]);
 
+  const selectedCountry = useMemo(
+    () => COUNTRY_CODES.find((c) => c.dial_code === countryCode),
+    [countryCode]
+  );
+
   const handlePhoneChange = (text: string) => {
     // Solo permitir números, espacios y guiones
     const cleaned = text.replace(/[^0-9\s-]/g, '');
     setPhone(cleaned);
+  };
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso requerido', 'Necesitamos acceso a tu galería para elegir una foto.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setAvatar(result.assets[0].uri);
+    }
   };
 
   const handleRelationSelect = (r: string) => {
@@ -66,7 +96,8 @@ export default function AgregarContactoScreen() {
     const contactData = {
       name,
       phone: `${countryCode} ${phone}`,
-      ...(finalRelation && { relation: finalRelation }), // Solo incluir si hay relación
+      avatar,
+      ...(finalRelation && { relation: finalRelation }),
     };
     
     addContact(contactData);
@@ -77,10 +108,14 @@ export default function AgregarContactoScreen() {
     <View style={styles.container}>
       <AppHeader title="Llamar" subtitle="Agregar contacto" showBack />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <View style={styles.avatarBox}>
-          <Text style={styles.avatarIcon}>👤</Text>
-          <Text style={styles.avatarLabel}>Agregar foto</Text>
-        </View>
+        <TouchableOpacity style={styles.avatarBox} onPress={handlePickImage}>
+          {avatar ? (
+            <Image source={{ uri: avatar }} style={styles.avatarImage} />
+          ) : (
+            <Text style={styles.avatarIcon}>👤</Text>
+          )}
+          <Text style={styles.avatarLabel}>{avatar ? 'Cambiar foto' : 'Agregar foto'}</Text>
+        </TouchableOpacity>
 
         <Text style={styles.label}>Nombre completo *</Text>
         <TextInput style={styles.input} placeholder="Ej: María García" value={name} onChangeText={setName} />
@@ -91,7 +126,9 @@ export default function AgregarContactoScreen() {
             style={styles.prefixBox} 
             onPress={() => setShowCountryPicker(true)}
           >
-            <Text style={styles.prefixText}>{countryCode} ▼</Text>
+            <Text style={styles.prefixText}>
+              {selectedCountry ? `${getFlagEmoji(selectedCountry.code)} ${countryCode}` : countryCode} ▼
+            </Text>
           </TouchableOpacity>
           <TextInput
             style={[styles.input, styles.phoneInput]}
@@ -161,6 +198,29 @@ export default function AgregarContactoScreen() {
               )}
             </View>
 
+            {/* Países comunes (solo cuando no hay búsqueda activa) */}
+            {!countrySearch.trim() && (
+              <View style={styles.commonSection}>
+                <Text style={styles.commonTitle}>Más usados</Text>
+                {commonCountries.map((item) => (
+                  <TouchableOpacity
+                    key={item.code}
+                    style={styles.countryOption}
+                    onPress={() => {
+                      setCountryCode(item.dial_code);
+                      setShowCountryPicker(false);
+                      setCountrySearch('');
+                    }}
+                  >
+                    <Text style={styles.flagText}>{getFlagEmoji(item.code)}</Text>
+                    <Text style={styles.countryCode}>{item.dial_code}</Text>
+                    <Text style={styles.countryName}>{item.name}</Text>
+                  </TouchableOpacity>
+                ))}
+                <View style={styles.divider} />
+              </View>
+            )}
+
             <ScrollView style={styles.countriesList}>
               {filteredCountries.length > 0 ? (
                 filteredCountries.map((item: CountryCode) => (
@@ -173,6 +233,7 @@ export default function AgregarContactoScreen() {
                       setCountrySearch('');
                     }}
                   >
+                    <Text style={styles.flagText}>{getFlagEmoji(item.code)}</Text>
                     <Text style={styles.countryCode}>{item.dial_code}</Text>
                     <Text style={styles.countryName}>{item.name}</Text>
                   </TouchableOpacity>
@@ -205,6 +266,7 @@ const styles = StyleSheet.create({
   content: { padding: Spacing.xl, gap: Spacing.sm },
   avatarBox: { alignItems: 'center', marginBottom: Spacing.lg },
   avatarIcon: { fontSize: 64 },
+  avatarImage: { width: 90, height: 90, borderRadius: 45 },
   avatarLabel: { color: Colors.primary, fontSize: FontSizes.sm, marginTop: Spacing.xs },
   label: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.textPrimary, marginTop: Spacing.sm },
   input: {
@@ -298,16 +360,39 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.inputBorder,
   },
+  flagText: {
+    fontSize: 22,
+    marginRight: Spacing.sm,
+    width: 32,
+    textAlign: 'center',
+  },
   countryCode: {
     fontSize: FontSizes.lg,
     fontWeight: '600',
     color: Colors.textPrimary,
-    width: 70,
+    width: 60,
   },
   countryName: {
     fontSize: FontSizes.md,
     color: Colors.textSecondary,
     flex: 1,
+  },
+  commonSection: {
+    marginBottom: Spacing.xs,
+  },
+  commonTitle: {
+    fontSize: FontSizes.sm,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.inputBorder,
+    marginVertical: Spacing.xs,
   },
   noResults: {
     padding: Spacing.xl,
