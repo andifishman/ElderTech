@@ -1,12 +1,17 @@
+import AppHeader from '@/components/ui/AppHeader';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useContacts } from '@/context/ContactsContext';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, TextInput, Alert, Modal,
+    Alert, Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useContacts } from '@/context/ContactsContext';
-import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
 
 export default function LlamarScreen() {
   const router = useRouter();
@@ -57,6 +62,9 @@ export default function LlamarScreen() {
             <View style={styles.contactInfo}>
               <Text style={styles.contactName}>{contact.name}</Text>
               <Text style={styles.contactPhone}>{contact.phone}</Text>
+              {contact.relation && (
+                <Text style={styles.contactRelation}>👤 {contact.relation}</Text>
+              )}
             </View>
             <View style={styles.contactActions}>
               <TouchableOpacity
@@ -132,6 +140,7 @@ const styles = StyleSheet.create({
   contactInfo: { flex: 1, minWidth: 100 },
   contactName: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.textPrimary },
   contactPhone: { fontSize: FontSizes.sm, color: Colors.textSecondary },
+  contactRelation: { fontSize: FontSizes.xs, color: Colors.primary, fontWeight: '600', marginTop: 2 },
   contactActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, flexWrap: 'wrap' },
   editBtn: {
     backgroundColor: Colors.info, borderRadius: Radius.sm,

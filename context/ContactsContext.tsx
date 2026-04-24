@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 export interface Contact {
   id: string;
   name: string;
   phone: string;
-  relation: string;
+  relation?: string;
   avatar?: string;
 }
 
