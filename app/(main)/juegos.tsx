@@ -3,10 +3,10 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  ScrollView,
-  StyleSheet,
-  Text, TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
 
 const games = [
@@ -34,15 +34,23 @@ const games = [
     color: Colors.successLight,
     iconBg: Colors.success,
   },
+  {
+    id: 'conexiones',
+    icon: '🔗',
+    title: 'Conexiones',
+    subtitle: 'Agrupá las palabras por categoría',
+    color: Colors.infoLight,
+    iconBg: Colors.info,
+  },
 ];
 
 export default function JuegosScreen() {
   const router = useRouter();
-
+  const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
       <AppHeader title="Juegos" subtitle="Divertite con ElderTech" showBack />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.heading}>Elegí un juego</Text>
         {games.map((game) => (
           <TouchableOpacity
@@ -55,6 +63,8 @@ export default function JuegosScreen() {
                 router.push('/(main)/juegos/ahorcado' as any);
               } else if (game.id === 'simon') {
                 router.push('/(main)/juegos/simon' as any);
+              } else if (game.id === 'conexiones') {
+                router.push('/(main)/juegos/conexiones' as any);
               }
             }}
             activeOpacity={0.8}

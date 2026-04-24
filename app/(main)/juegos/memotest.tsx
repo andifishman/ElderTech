@@ -3,11 +3,11 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text, TouchableOpacity,
-  View,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
 
 // Pool completo de emojis tecnológicos + algunos clásicos
@@ -47,6 +47,7 @@ type Screen = 'difficulty' | 'game';
 
 export default function MemotestScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [screen, setScreen] = useState<Screen>('difficulty');
   const [selectedDiff, setSelectedDiff] = useState(DIFFICULTIES[1]); // Normal por defecto
   const [cards, setCards] = useState<Card[]>([]);
@@ -117,7 +118,7 @@ export default function MemotestScreen() {
     return (
       <View style={styles.container}>
         <AppHeader title="Memotest" subtitle="Encontrá los pares de cartas" showBack />
-        <ScrollView contentContainerStyle={styles.diffContent}>
+        <ScrollView contentContainerStyle={[styles.diffContent, { paddingBottom: insets.bottom + 24 }]}>
           <Text style={styles.diffTitle}>Elegí la dificultad</Text>
           <Text style={styles.diffSubtitle}>¿Cuántos pares querés encontrar?</Text>
 
@@ -197,7 +198,7 @@ export default function MemotestScreen() {
         </View>
       </ScrollView>
 
-      <View style={styles.bottomRow}>
+      <View style={[styles.bottomRow, { marginBottom: insets.bottom + 12 }]}>
         <TouchableOpacity style={styles.changeDiffBtn} onPress={() => setScreen('difficulty')} activeOpacity={0.8}>
           <Text style={styles.changeDiffText}>⚙️ Dificultad</Text>
         </TouchableOpacity>
@@ -238,6 +239,7 @@ const styles = StyleSheet.create({
   diffContent: {
     padding: Spacing.lg,
     gap: Spacing.md,
+    paddingBottom: 32,
   },
   diffTitle: {
     fontSize: FontSizes.xxl,
@@ -319,7 +321,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.sm,
     marginHorizontal: Spacing.lg,
-    marginVertical: Spacing.md,
+    marginTop: Spacing.sm,
   },
   changeDiffBtn: {
     flex: 1,

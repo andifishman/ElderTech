@@ -1,10 +1,13 @@
+import AppHeader from '@/components/ui/AppHeader';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
 
 const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
@@ -49,6 +52,7 @@ function formatDateLabel(d: Date) {
 
 export default function HorariosScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const today = new Date(2025, 3, 7); // April 7 2025
   const [selectedDate, setSelectedDate] = useState(today);
   const weekDates = getWeekDates(selectedDate);
@@ -80,7 +84,7 @@ export default function HorariosScreen() {
         {formatDateLabel(selectedDate).charAt(0).toUpperCase() + formatDateLabel(selectedDate).slice(1)}
       </Text>
 
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
         {activities.length === 0 ? (
           <Text style={styles.emptyText}>No hay actividades para este día</Text>
         ) : (

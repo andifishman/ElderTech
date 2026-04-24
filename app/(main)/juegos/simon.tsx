@@ -74,38 +74,76 @@ function SimonBoard({
   onPress: (id: number) => void;
   disabled: boolean;
 }) {
+  // Áreas táctiles para cada cuadrante (top-left, top-right, bottom-left, bottom-right)
+  // Orden: Verde(0)=top-left, Rojo(1)=top-right, Amarillo(2)=bottom-left, Azul(3)=bottom-right
+  const half = SIZE / 2;
+  const quadrants = [
+    { id: 0, top: 0,    left: 0,    width: half, height: half }, // Verde top-left
+    { id: 1, top: 0,    left: half, width: half, height: half }, // Rojo top-right
+    { id: 2, top: half, left: 0,    width: half, height: half }, // Amarillo bottom-left
+    { id: 3, top: half, left: half, width: half, height: half }, // Azul bottom-right
+  ];
+
   return (
-    <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-      {/* Borde exterior negro */}
-      <Circle cx={CX} cy={CY} r={R_OUT + 3} fill="#111111" />
+    <View style={{ width: SIZE, height: SIZE }}>
+      <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+        {/* Borde exterior negro */}
+        <Circle cx={CX} cy={CY} r={R_OUT + 3} fill="#111111" />
 
-      {/* Sectores */}
-      {SECTORS.map((s) => {
-        const isActive = activeBtn === s.id;
-        const fill = isActive ? s.color : s.dim;
-        const path = sectorPath(s.startDeg, s.endDeg, R_OUT, R_IN + 4, GAP);
-        return (
-          <Path
-            key={s.id}
-            d={path}
-            fill={fill}
-            onPress={() => { if (!disabled) onPress(s.id); }}
-          />
-        );
-      })}
+        {/* Sectores */}
+        {SECTORS.map((s) => {
+          const isActive = activeBtn === s.id;
+          const fill = isActive ? s.color : s.dim;
+          const path = sectorPath(s.startDeg, s.endDeg, R_OUT, R_IN + 4, GAP);
+          return (
+            <Path
+              key={s.id}
+              d={path}
+              fill={fill}
+            />
+          );
+        })}
 
-      {/* Círculo central negro */}
-      <Circle cx={CX} cy={CY} r={R_IN} fill="#1A1A1A" />
+        {/* Círculo central negro */}
+        <Circle cx={CX} cy={CY} r={R_IN} fill="#1A1A1A" />
+      </Svg>
 
-      {/* Texto central */}
-      {/* Usamos foreignObject no disponible en RN, así que superponemos con View */}
-    </Svg>
+      {/* Áreas táctiles superpuestas por cuadrante */}
+      {quadrants.map((q) => (
+        <TouchableOpacity
+          key={q.id}
+          style={{
+            position: 'absolute',
+            top: q.top,
+            left: q.left,
+            width: q.width,
+            height: q.height,
+          }}
+          onPress={() => { if (!disabled) onPress(q.id); }}
+          activeOpacity={0.7}
+        />
+      ))}
+
+      {/* Círculo central bloqueador de toques (para no activar el cuadrante de abajo) */}
+      <View
+        style={{
+          position: 'absolute',
+          top: CY - R_IN,
+          left: CX - R_IN,
+          width: R_IN * 2,
+          height: R_IN * 2,
+          borderRadius: R_IN,
+        }}
+        pointerEvents="box-only"
+      />
+    </View>
   );
 }
 
 // ─── Pantalla principal ───────────────────────────────────────────────────────
 export default function SimonScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [sequence, setSequence]       = useState<number[]>([]);
   const [playerIndex, setPlayerIndex] = useState(0);
   const [phase, setPhase]             = useState<Phase>('idle');
@@ -183,7 +221,7 @@ export default function SimonScreen() {
     <View style={styles.container}>
       <AppHeader title="Simon Dice" subtitle="Repetí la secuencia de colores" showBack />
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
         {/* ── Explicación ── */}
         {phase === 'idle' && (
@@ -214,7 +252,6 @@ export default function SimonScreen() {
 
         {/* ── Tablero ── */}
         <View style={styles.boardWrapper}>
-          {/* SVG del tablero */}
           <SimonBoard
             activeBtn={activeBtn}
             level={sequence.length}

@@ -137,6 +137,7 @@ function HangmanSvg({ errores, color }: { errores: number; color: string }) {
 
 export default function AhorcadoScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [palabra, setPalabra] = useState('');
   const [letrasUsadas, setLetrasUsadas] = useState<Set<string>>(new Set());
   const [errores, setErrores] = useState(0);
@@ -196,7 +197,7 @@ export default function AhorcadoScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
         {/* Dibujo del ahorcado */}
         <View style={styles.hangmanContainer}>

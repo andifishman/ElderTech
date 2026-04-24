@@ -3,13 +3,13 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { Audio } from 'expo-av';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

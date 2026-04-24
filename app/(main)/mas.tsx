@@ -3,19 +3,21 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text, TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MasScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
       <AppHeader title="Más" subtitle="Ver más opciones de la aplicación" showBack />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
         {/* Clima */}
         <TouchableOpacity

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 interface User {
   fullName: string;
@@ -30,7 +30,10 @@ const mockUsers: Array<User & { password: string }> = [
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const { password: _, ...userData } = mockUsers[0];
+    return userData;
+  });
 
   const login = (username: string, password: string): boolean => {
     const found = mockUsers.find(

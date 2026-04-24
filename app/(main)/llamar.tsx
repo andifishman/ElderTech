@@ -17,6 +17,7 @@ import {
 
 export default function LlamarScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { contacts, deleteContact } = useContacts();
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export default function LlamarScreen() {
     <View style={styles.container}>
       <AppHeader title="Llamar" subtitle="Contactá a personas" showBack />
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={styles.addBtn}
           onPress={() => router.push('/(main)/llamar/agregar' as any)}
