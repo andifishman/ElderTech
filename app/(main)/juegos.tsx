@@ -1,10 +1,13 @@
+import AppHeader from '@/components/ui/AppHeader';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
 
 const games = [
   {
@@ -23,6 +26,14 @@ const games = [
     color: Colors.purpleLight,
     iconBg: Colors.purple,
   },
+  {
+    id: 'simon',
+    icon: '🟢',
+    title: 'Simon Dice',
+    subtitle: 'Repetí la secuencia de colores',
+    color: Colors.successLight,
+    iconBg: Colors.success,
+  },
 ];
 
 export default function JuegosScreen() {
@@ -40,6 +51,10 @@ export default function JuegosScreen() {
             onPress={() => {
               if (game.id === 'memotest') {
                 router.push('/(main)/juegos/memotest' as any);
+              } else if (game.id === 'palabras') {
+                router.push('/(main)/juegos/ahorcado' as any);
+              } else if (game.id === 'simon') {
+                router.push('/(main)/juegos/simon' as any);
               }
             }}
             activeOpacity={0.8}

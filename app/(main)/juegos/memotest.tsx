@@ -1,18 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal,
-} from 'react-native';
 import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View,
+} from 'react-native';
 
-const EMOJIS = ['🌸', '🦋', '🎵', '⭐', '🐶', '🌈'];
+// Pool completo de emojis tecnológicos + algunos clásicos
+const ALL_EMOJIS = [
+  '💻', '📱', '😁', '🖥️', '❤️', '😎', '📷', '📸',
+  '📺', '🍕', '🎧', '🔋', '🍔', '💿', '🍟', '🌭',
+  // '🚗', '✈️', '☎️', '🚀', '🐬', '🐯', '🦆', '🐧','🦁','🐭','🐴','🐼','🐔',
+];
+
+// Dificultades
+const DIFFICULTIES = [
+  { label: 'Fácil',   pairs: 4,  icon: '😊', color: Colors.success,  colorLight: Colors.successLight },
+  { label: 'Normal',  pairs: 6,  icon: '🙂', color: Colors.info,     colorLight: Colors.infoLight    },
+  { label: 'Difícil', pairs: 10, icon: '🚨', color: Colors.warning,  colorLight: '#FFF3E0'            },
+  { label: 'Experto', pairs: 12, icon: '🔥', color: Colors.danger,   colorLight: Colors.dangerLight  },
+];
 
 function shuffle<T>(arr: T[]): T[] {
-  return [...arr, ...arr]
+  return [...arr]
     .map((v) => ({ v, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
     .map(({ v }) => v);
+}
+
+function getEmojis(count: number): string[] {
+  return shuffle(ALL_EMOJIS).slice(0, count);
 }
 
 interface Card {
@@ -22,8 +43,12 @@ interface Card {
   matched: boolean;
 }
 
+type Screen = 'difficulty' | 'game';
+
 export default function MemotestScreen() {
   const router = useRouter();
+  const [screen, setScreen] = useState<Screen>('difficulty');
+  const [selectedDiff, setSelectedDiff] = useState(DIFFICULTIES[1]); // Normal por defecto
   const [cards, setCards] = useState<Card[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -31,8 +56,9 @@ export default function MemotestScreen() {
   const [won, setWon] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
-  const initGame = () => {
-    const shuffled = shuffle(EMOJIS).map((emoji, id) => ({
+  const initGame = (diff = selectedDiff) => {
+    const emojis = getEmojis(diff.pairs);
+    const shuffled = shuffle([...emojis, ...emojis]).map((emoji, id) => ({
       id, emoji, flipped: false, matched: false,
     }));
     setCards(shuffled);
@@ -41,9 +67,8 @@ export default function MemotestScreen() {
     setPairs(0);
     setWon(false);
     setDisabled(false);
+    setScreen('game');
   };
-
-  useEffect(() => { initGame(); }, []);
 
   const handlePress = (id: number) => {
     if (disabled) return;
@@ -63,7 +88,6 @@ export default function MemotestScreen() {
       setDisabled(true);
 
       if (newCards[firstId].emoji === newCards[id].emoji) {
-        // Match
         setTimeout(() => {
           setCards((prev) =>
             prev.map((c) => c.id === firstId || c.id === id ? { ...c, matched: true } : c)
@@ -71,10 +95,9 @@ export default function MemotestScreen() {
           const newPairs = pairs + 1;
           setPairs(newPairs);
           setDisabled(false);
-          if (newPairs === EMOJIS.length) setWon(true);
+          if (newPairs === selectedDiff.pairs) setWon(true);
         }, 500);
       } else {
-        // No match
         setTimeout(() => {
           setCards((prev) =>
             prev.map((c) => c.id === firstId || c.id === id ? { ...c, flipped: false } : c)
@@ -85,9 +108,59 @@ export default function MemotestScreen() {
     }
   };
 
+  // Tamaño de carta según cantidad de pares
+  const cardSize = selectedDiff.pairs <= 6 ? 80 : selectedDiff.pairs <= 10 ? 66 : 58;
+  const emojiSize = selectedDiff.pairs <= 6 ? 38 : selectedDiff.pairs <= 10 ? 30 : 26;
+
+  // ── Pantalla de selección de dificultad ──────────────────────────────────
+  if (screen === 'difficulty') {
+    return (
+      <View style={styles.container}>
+        <AppHeader title="Memotest" subtitle="Encontrá los pares de cartas" showBack />
+        <ScrollView contentContainerStyle={styles.diffContent}>
+          <Text style={styles.diffTitle}>Elegí la dificultad</Text>
+          <Text style={styles.diffSubtitle}>¿Cuántos pares querés encontrar?</Text>
+
+          {DIFFICULTIES.map((diff) => (
+            <TouchableOpacity
+              key={diff.label}
+              style={[
+                styles.diffCard,
+                { backgroundColor: diff.colorLight, borderColor: diff.color },
+                selectedDiff.label === diff.label && { borderWidth: 3 },
+              ]}
+              onPress={() => setSelectedDiff(diff)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.diffIcon}>{diff.icon}</Text>
+              <View style={styles.diffInfo}>
+                <Text style={[styles.diffLabel, { color: diff.color }]}>{diff.label}</Text>
+                <Text style={styles.diffPairs}>{diff.pairs} pares · {diff.pairs * 2} cartas</Text>
+              </View>
+              {selectedDiff.label === diff.label && (
+                <View style={[styles.diffCheck, { backgroundColor: diff.color }]}>
+                  <Text style={styles.diffCheckText}>✓</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity
+            style={[styles.startBtn, { backgroundColor: selectedDiff.color }]}
+            onPress={() => initGame(selectedDiff)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.startBtnText}>▶  Empezar juego</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // ── Pantalla de juego ────────────────────────────────────────────────────
   return (
     <View style={styles.container}>
-      <AppHeader title="Memotest" subtitle="Encontrá los pares de cartas" showBack />
+      <AppHeader title="Memotest" subtitle={`Dificultad: ${selectedDiff.label}`} showBack />
 
       <View style={styles.statsRow}>
         <View style={styles.stat}>
@@ -96,34 +169,42 @@ export default function MemotestScreen() {
         </View>
         <View style={styles.stat}>
           <Text style={styles.statLabel}>Pares encontrados</Text>
-          <Text style={styles.statValue}>{pairs} / {EMOJIS.length}</Text>
+          <Text style={styles.statValue}>{pairs} / {selectedDiff.pairs}</Text>
         </View>
       </View>
 
       <Text style={styles.hint}>Tocá las cartas para darles vuelta</Text>
 
-      <View style={styles.grid}>
-        {cards.map((card) => (
-          <TouchableOpacity
-            key={card.id}
-            style={[
-              styles.card,
-              card.flipped || card.matched ? styles.cardFlipped : styles.cardHidden,
-              card.matched && styles.cardMatched,
-            ]}
-            onPress={() => handlePress(card.id)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.cardEmoji}>
-              {card.flipped || card.matched ? card.emoji : ''}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView contentContainerStyle={styles.gridWrapper} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
+          {cards.map((card) => (
+            <TouchableOpacity
+              key={card.id}
+              style={[
+                styles.card,
+                { width: cardSize, height: cardSize },
+                card.flipped || card.matched ? styles.cardFlipped : styles.cardHidden,
+                card.matched && styles.cardMatched,
+              ]}
+              onPress={() => handlePress(card.id)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.cardEmoji, { fontSize: emojiSize }]}>
+                {card.flipped || card.matched ? card.emoji : ''}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
-      <TouchableOpacity style={styles.newGameBtn} onPress={initGame}>
-        <Text style={styles.newGameBtnText}>🔄 Nuevo juego</Text>
-      </TouchableOpacity>
+      <View style={styles.bottomRow}>
+        <TouchableOpacity style={styles.changeDiffBtn} onPress={() => setScreen('difficulty')} activeOpacity={0.8}>
+          <Text style={styles.changeDiffText}>⚙️ Dificultad</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.newGameBtn} onPress={() => initGame(selectedDiff)} activeOpacity={0.8}>
+          <Text style={styles.newGameBtnText}>🔄 Nuevo juego</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Win modal */}
       <Modal visible={won} transparent animationType="fade">
@@ -131,9 +212,17 @@ export default function MemotestScreen() {
           <View style={styles.modalBox}>
             <Text style={styles.winIcon}>🎉</Text>
             <Text style={styles.winTitle}>¡Ganaste!</Text>
-            <Text style={styles.winSub}>¡Muy bien! Encontraste todos los pares.</Text>
-            <TouchableOpacity style={styles.winBtn} onPress={() => router.back()}>
-              <Text style={styles.winBtnText}>Volver al inicio</Text>
+            <Text style={styles.winSub}>
+              ¡Muy bien! Encontraste los {selectedDiff.pairs} pares en {moves} movimientos.
+            </Text>
+            <TouchableOpacity style={[styles.winBtnPrimary, { backgroundColor: selectedDiff.color }]} onPress={() => initGame(selectedDiff)}>
+              <Text style={styles.winBtnPrimaryText}>Jugar de nuevo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.winBtnSecondary} onPress={() => setScreen('difficulty')}>
+              <Text style={[styles.winBtnSecondaryText, { color: selectedDiff.color }]}>Cambiar dificultad</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.winBtnBack} onPress={() => router.back()}>
+              <Text style={styles.winBtnBackText}>Volver</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -144,6 +233,55 @@ export default function MemotestScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+
+  // ── Dificultad ──
+  diffContent: {
+    padding: Spacing.lg,
+    gap: Spacing.md,
+  },
+  diffTitle: {
+    fontSize: FontSizes.xxl,
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
+  },
+  diffSubtitle: {
+    fontSize: FontSizes.md,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  diffCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Radius.lg,
+    padding: Spacing.lg,
+    borderWidth: 1.5,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  diffIcon: { fontSize: 36, marginRight: Spacing.md },
+  diffInfo: { flex: 1 },
+  diffLabel: { fontSize: FontSizes.xl, fontWeight: 'bold' },
+  diffPairs: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 2 },
+  diffCheck: {
+    width: 32, height: 32, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  diffCheckText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.md },
+  startBtn: {
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+  },
+  startBtnText: { color: Colors.white, fontSize: FontSizes.lg, fontWeight: 'bold' },
+
+  // ── Juego ──
   statsRow: {
     flexDirection: 'row', justifyContent: 'space-around',
     backgroundColor: Colors.white, paddingVertical: Spacing.md,
@@ -156,12 +294,17 @@ const styles = StyleSheet.create({
     textAlign: 'center', fontSize: FontSizes.sm,
     color: Colors.textSecondary, paddingVertical: Spacing.md,
   },
+  gridWrapper: {
+    flexGrow: 1,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+  },
   grid: {
     flexDirection: 'row', flexWrap: 'wrap',
-    justifyContent: 'center', paddingHorizontal: Spacing.lg, gap: Spacing.sm,
+    justifyContent: 'center', gap: Spacing.sm,
   },
   card: {
-    width: 72, height: 72, borderRadius: Radius.md,
+    borderRadius: Radius.md,
     alignItems: 'center', justifyContent: 'center',
     shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15, shadowRadius: 4, elevation: 3,
@@ -169,27 +312,55 @@ const styles = StyleSheet.create({
   cardHidden: { backgroundColor: Colors.primary },
   cardFlipped: { backgroundColor: Colors.white, borderWidth: 2, borderColor: Colors.primary },
   cardMatched: { backgroundColor: Colors.successLight, borderWidth: 2, borderColor: Colors.success },
-  cardEmoji: { fontSize: 36 },
+  cardEmoji: {},
+
+  // Botones inferiores
+  bottomRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.md,
+  },
+  changeDiffBtn: {
+    flex: 1,
+    borderWidth: 2, borderColor: Colors.primary,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
+  },
+  changeDiffText: { color: Colors.primary, fontSize: FontSizes.md, fontWeight: 'bold' },
   newGameBtn: {
+    flex: 2,
     backgroundColor: Colors.primary, borderRadius: Radius.sm,
     paddingVertical: Spacing.md, alignItems: 'center',
-    marginHorizontal: Spacing.xl, marginTop: Spacing.xl,
   },
-  newGameBtnText: { color: Colors.white, fontSize: FontSizes.lg, fontWeight: 'bold' },
+  newGameBtnText: { color: Colors.white, fontSize: FontSizes.md, fontWeight: 'bold' },
+
+  // Modal
   modalOverlay: {
     flex: 1, backgroundColor: '#00000066',
     alignItems: 'center', justifyContent: 'center',
   },
   modalBox: {
     backgroundColor: Colors.white, borderRadius: Radius.lg,
-    padding: Spacing.xxl, width: '80%', alignItems: 'center',
+    padding: Spacing.xxl, width: '85%', alignItems: 'center',
   },
   winIcon: { fontSize: 64, marginBottom: Spacing.md },
   winTitle: { fontSize: FontSizes.xxl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.sm },
   winSub: { fontSize: FontSizes.md, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.xl },
-  winBtn: {
-    borderWidth: 2, borderColor: Colors.primary, borderRadius: Radius.sm,
-    paddingVertical: Spacing.md, paddingHorizontal: Spacing.xxl,
+  winBtnPrimary: {
+    borderRadius: Radius.sm, paddingVertical: Spacing.md,
+    width: '100%', alignItems: 'center', marginBottom: Spacing.sm,
   },
-  winBtnText: { color: Colors.primary, fontSize: FontSizes.lg, fontWeight: 'bold' },
+  winBtnPrimaryText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.lg },
+  winBtnSecondary: {
+    borderWidth: 2, borderColor: Colors.border,
+    borderRadius: Radius.sm, paddingVertical: Spacing.md,
+    width: '100%', alignItems: 'center', marginBottom: Spacing.sm,
+  },
+  winBtnSecondaryText: { fontWeight: 'bold', fontSize: FontSizes.md },
+  winBtnBack: {
+    paddingVertical: Spacing.sm,
+  },
+  winBtnBackText: { color: Colors.textSecondary, fontSize: FontSizes.md },
 });
