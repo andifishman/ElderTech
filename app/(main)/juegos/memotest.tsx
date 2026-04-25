@@ -9,6 +9,7 @@ import {
     Text, TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Pool completo de emojis tecnológicos + algunos clásicos
 const ALL_EMOJIS = [

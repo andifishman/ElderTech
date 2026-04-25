@@ -8,6 +8,7 @@ import {
     Text, TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
