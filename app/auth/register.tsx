@@ -89,8 +89,8 @@ export default function RegisterScreen() {
 
         <View style={styles.form}>
           {[
-            { label: 'Nombre completo *', value: fullName, setter: setFullName, placeholder: 'María García' },
-            { label: 'Nombre de usuario *', value: username, setter: setUsername, placeholder: 'mariagarcia' },
+            { label: 'Nombre completo *', value: fullName, setter: setFullName, placeholder: 'Ej: María García' },
+            { label: 'Nombre de usuario *', value: username, setter: setUsername, placeholder: 'Ej: mariagarcia' },
             { label: 'Piso / Habitación', value: floor, setter: setFloor, placeholder: 'Ej: 3A' },
           ].map((field) => (
             <View key={field.label}>
@@ -98,6 +98,7 @@ export default function RegisterScreen() {
               <TextInput
                 style={styles.input}
                 placeholder={field.placeholder}
+                placeholderTextColor="#BBBBBB"
                 value={field.value}
                 onChangeText={field.setter}
                 autoCapitalize="none"
@@ -138,12 +139,13 @@ export default function RegisterScreen() {
           <Text style={styles.label}>Correo electrónico *</Text>
           <TextInput
             style={[styles.input, emailError ? styles.inputError : null]}
-            placeholder="maria@gmail.com"
+            placeholder="Ej: maria@gmail.com"
             value={email}
             onChangeText={handleEmailChange}
             autoCapitalize="none"
             keyboardType="email-address"
             autoComplete="email"
+            placeholderTextColor="#BBBBBB"
           />
           {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 

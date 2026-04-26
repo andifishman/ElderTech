@@ -64,10 +64,11 @@ export default function LoginScreen() {
           <View style={styles.inputRow}>
             <TextInput
               style={styles.input}
-              placeholder="María García"
+              placeholder="Ej: María García"
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
+              placeholderTextColor="#BBBBBB"
             />
             <Text style={styles.inputIcon}>👤</Text>
           </View>
@@ -80,6 +81,7 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
+              placeholderTextColor="#BBBBBB"
             />
             <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
               <Text style={styles.inputIcon}>{showPassword ? '🙈' : '👁️'}</Text>

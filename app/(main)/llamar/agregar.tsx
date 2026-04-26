@@ -236,7 +236,7 @@ export default function AgregarContactoScreen() {
           </TouchableOpacity>
           <TextInput
             style={[styles.input, styles.phoneInput]}
-            placeholder="11 1234-5678"
+            placeholder="Ej: 11 1234-5678"
             value={phone}
             onChangeText={handlePhoneChange}
             keyboardType="phone-pad"

@@ -90,7 +90,7 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Utilidades</Text>
-            <Text style={styles.cardSub}>Linterna y tamaño de letra</Text>
+            <Text style={styles.cardSub}>Linterna</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>

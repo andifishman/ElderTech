@@ -1,10 +1,13 @@
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, Alert,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text, TextInput, TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
 
 export default function RecoverScreen() {
   const router = useRouter();
@@ -45,7 +48,7 @@ export default function RecoverScreen() {
         <Text style={styles.label}>Correo electrónico *</Text>
         <TextInput
           style={styles.input}
-          placeholder="mi.correo@gmail.com"
+          placeholder="Ej: mi.correo@gmail.com"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"

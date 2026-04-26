@@ -79,6 +79,7 @@ export default function SopaScreen() {
   const [found, setFound] = useState<string[]>([]);
   const [foundCells, setFoundCells] = useState<Set<string>>(new Set());
   const [won, setWon] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   const initGame = useCallback((idx = temaIdx) => {
     const tema = TEMAS[idx];
@@ -197,6 +198,25 @@ export default function SopaScreen() {
         </View>
 
       </ScrollView>
+
+      {/* Tutorial */}
+      <Modal visible={showTutorial} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalIcon}>🔤</Text>
+            <Text style={styles.modalTitle}>¿Cómo se juega?</Text>
+            <Text style={styles.modalSub}>
+              Hay palabras escondidas en la grilla de letras.{'\n\n'}
+              Tocá las letras una por una para formar la palabra. Las palabras pueden estar en cualquier dirección.{'\n\n'}
+              Las palabras a encontrar aparecen arriba. Cuando encontrás una, se marca en verde.{'\n\n'}
+              Elegí el tema que más te guste con los botones de arriba.
+            </Text>
+            <TouchableOpacity style={styles.modalBtn} onPress={() => setShowTutorial(false)}>
+              <Text style={styles.modalBtnText}>¡Entendido, a jugar!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={won} transparent animationType="fade">
         <View style={styles.modalOverlay}>

@@ -1,63 +1,45 @@
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
+import * as Speech from 'expo-speech';
 import { useState } from 'react';
 import {
-    Dimensions,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text, TouchableOpacity,
-    View
+  Dimensions,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
 const menuItems = [
   { 
-    id: 'horarios', 
-    icon: '📅', 
-    label: 'Horarios', 
-    subtitle: 'Actividades de la semana', 
-    color: '#FFE5E5', 
-    iconBg: '#FF9999',
-    size: 'large' 
+    id: 'horarios', icon: '📅', label: 'Horarios', 
+    subtitle: 'Actividades de la semana', color: '#FFE5E5', iconBg: '#FF9999', size: 'large',
+    audio: 'Horarios. Acá podés ver todas las actividades de la semana, con sus horarios y descripciones.',
   },
   { 
-    id: 'llamar', 
-    icon: '📞', 
-    label: 'Llamar', 
-    subtitle: 'Contactar familia', 
-    color: '#E5F9E5', 
-    iconBg: '#99E699',
-    size: 'medium' 
+    id: 'llamar', icon: '📞', label: 'Llamar', 
+    subtitle: 'Contactar a personas', color: '#E5F9E5', iconBg: '#99E699', size: 'medium',
+    audio: 'Llamar. Desde acá podés llamar o escribirle por WhatsApp a tu familia y amigos.',
   },
   { 
-    id: 'articulos', 
-    icon: '📚', 
-    label: 'Artículos', 
-    subtitle: 'Aprendé con videos', 
-    color: '#F0E5FF', 
-    iconBg: '#CC99FF',
-    size: 'medium' 
+    id: 'articulos', icon: '📚', label: 'Artículos', 
+    subtitle: 'Aprendé con videos', color: '#F0E5FF', iconBg: '#CC99FF', size: 'medium',
+    audio: 'Artículos. Encontrás guías y videos para aprender a usar el celular paso a paso.',
   },
   { 
-    id: 'asistente', 
-    icon: '🤖', 
-    label: 'Asistente', 
-    subtitle: 'Asistente personal para ayudas', 
-    color: '#E5F5FF', 
-    iconBg: '#99CCFF',
-    size: 'medium' 
+    id: 'asistente', icon: '🤖', label: 'Asistente', 
+    subtitle: 'Asistente personal para ayudas', color: '#E5F5FF', iconBg: '#99CCFF', size: 'medium',
+    audio: 'Asistente. Podés hacerle preguntas y te va a responder de forma simple y clara.',
   },
   { 
-    id: 'mas', 
-    icon: '➕', 
-    label: 'Más', 
-    subtitle: 'Ver más opciones de la aplicación', 
-    color: '#FFF0E5', 
-    iconBg: '#FFCC99',
-    size: 'medium' 
+    id: 'mas', icon: '➕', label: 'Más', 
+    subtitle: 'Ver más opciones de la aplicación', color: '#FFF0E5', iconBg: '#FFCC99', size: 'medium',
+    audio: 'Más opciones. Acá encontrás juegos, radio, noticias, clima, linterna y más.',
   },
 ];
 
@@ -65,6 +47,12 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
+  const insets = useSafeAreaInsets();
+
+  const speak = (text: string) => {
+    Speech.stop();
+    Speech.speak(text, { language: 'es-AR', rate: 0.9 });
+  };
 
   const handleLogout = () => {
     logout();
@@ -96,7 +84,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Menu Grid */}
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.grid, { paddingBottom: insets.bottom + 32 }]} showsVerticalScrollIndicator={false}>
         {/* Large Horarios Card */}
         <TouchableOpacity
           style={[styles.largeCard, { backgroundColor: menuItems[0].color }]}
@@ -114,9 +102,13 @@ export default function HomeScreen() {
             </View>
           </View>
           <View style={styles.largeCardBottom}>
-            <View style={[styles.smallIconCircle, { backgroundColor: menuItems[0].iconBg }]}>
-              <Text style={styles.smallIcon}>🔊</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.audioBtn}
+              onPress={() => speak(menuItems[0].audio)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.audioBtnText}>🔊  Escuchar descripción</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
 
@@ -138,9 +130,13 @@ export default function HomeScreen() {
                 <Text style={styles.mediumCardSub}>{item.subtitle}</Text>
               </View>
               <View style={styles.mediumCardBottom}>
-                <View style={[styles.smallSpeakerCircle, { backgroundColor: item.iconBg }]}>
-                  <Text style={styles.smallSpeakerIcon}>🔊</Text>
-                </View>
+                <TouchableOpacity
+                  style={styles.audioBtn}
+                  onPress={() => speak(item.audio)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.audioBtnText}>🔊  Escuchar</Text>
+                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           ))}
@@ -162,9 +158,13 @@ export default function HomeScreen() {
                 <Text style={styles.mediumCardSub}>{item.subtitle}</Text>
               </View>
               <View style={styles.mediumCardBottom}>
-                <View style={[styles.smallSpeakerCircle, { backgroundColor: item.iconBg }]}>
-                  <Text style={styles.smallSpeakerIcon}>🔊</Text>
-                </View>
+                <TouchableOpacity
+                  style={styles.audioBtn}
+                  onPress={() => speak(item.audio)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.audioBtnText}>🔊  Escuchar</Text>
+                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           ))}
@@ -224,11 +224,11 @@ const styles = StyleSheet.create({
   logoText: { 
     color: Colors.white, 
     fontWeight: 'bold', 
-    fontSize: 24 
+    fontSize: 28 
   },
   logoSubtext: {
     color: '#E8F5E8',
-    fontSize: 14,
+    fontSize: 16,
   },
   avatarBtn: {
     width: 40, 
@@ -246,22 +246,23 @@ const styles = StyleSheet.create({
   // Welcome Section
   welcomeSection: {
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingTop: 14,
+    paddingBottom: 10,
   },
   welcome: { 
     color: '#2E3A59', 
-    fontSize: 22, 
+    fontSize: 26, 
     fontWeight: 'bold',
     marginBottom: 4,
   },
   welcomeSub: { 
     color: '#8A8A8A', 
-    fontSize: 16,
+    fontSize: 18,
   },
   // Grid Layout
   grid: { 
     padding: 20,
-    paddingTop: 25,
+    paddingTop: 6,
   },
 
   // Large Card (Horarios)
@@ -301,19 +302,33 @@ const styles = StyleSheet.create({
     flex: 1 
   },
   largeCardLabel: { 
-    fontSize: 28, 
+    fontSize: 32, 
     fontWeight: 'bold', 
     color: '#2E3A59',
     marginBottom: 4,
   },
   largeCardSub: { 
-    fontSize: 16, 
+    fontSize: 18, 
     color: '#666',
   },
   largeCardBottom: {
     alignItems: 'flex-end',
     marginTop: 10,
   },
+  audioBtn: {
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    width: '100%',
+  },
+  audioBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#2E3A59',
+  },
+  // Botones inferiores legacy (por si quedan referencias)
   smallIconCircle: {
     width: 40,
     height: 40,
@@ -359,16 +374,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mediumCardLabel: { 
-    fontSize: 18, 
+    fontSize: 22, 
     fontWeight: 'bold', 
     color: '#2E3A59',
     marginBottom: 6,
     marginTop: 8,
   },
   mediumCardSub: { 
-    fontSize: 13, 
+    fontSize: 15, 
     color: '#666',
-    lineHeight: 18,
+    lineHeight: 20,
   },
   mediumIconCircle: {
     width: 48,

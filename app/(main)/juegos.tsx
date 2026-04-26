@@ -22,7 +22,7 @@ const games = [
   {
     id: 'palabras',
     icon: '🔤',
-    title: 'Completar palabras',
+    title: 'Ahorcado',
     subtitle: 'Encontrá la letra que falta',
     color: Colors.purpleLight,
     iconBg: Colors.purple,

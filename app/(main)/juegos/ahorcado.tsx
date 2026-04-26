@@ -3,32 +3,67 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 
 // Palabras de 6 a 9 letras
 const PALABRAS = [
-  'CAMINO', 'PUENTE', 'CIUDAD', 'FLORES', 'TIEMPO',
-  'MUSICA', 'COCINA', 'JARDIN', 'VERANO', 'INVIERNO',
-  'FAMILIA', 'AMISTAD', 'TRABAJO', 'ESCUELA', 'MERCADO',
-  'VENTANA', 'CARPETA', 'CABALLO', 'PALOMAS', 'MONTANA',
-  'ESTRELLA', 'MARIPOSA', 'TORTUGA', 'ELEFANTE', 'GIRASOL',
-  'NARANJA', 'MANZANA', 'SANDALIA', 'SOMBRERO', 'PARAGUAS',
-  'HOSPITAL', 'FARMACIA', 'IGLESIA', 'TELEFONO', 'ABUELITA',
+  // Naturaleza
+  'CAMINO','PUENTE','CIUDAD','FLORES','TIEMPO','JARDIN','VERANO','INVIERNO',
+  'MONTANA','ESTRELLA','MARIPOSA','GIRASOL','NARANJA','MANZANA','SANDALIA',
+  'SOMBRERO','PARAGUAS','PALOMAS','TORTUGA','ELEFANTE',
+  // Casa y objetos
+  'VENTANA','CARPETA','COCINA','HELADERA','TELEVISION','SILLON','ESCALERA',
+  'LAMPARA','ESPEJO','ALMOHADA','CORTINA','CAFETERA','LAVADORA','NEVERA',
+  'CUADERNO','LAPICERA','MOCHILA','TIJERAS','RELOJ','TELEFONO',
+  // Comida
+  'EMPANADA','MILANESA','CHOCOLATE','MEDIALUNAS','FACTURAS','ENSALADA',
+  'ZANAHORIA','ESPINACA','BROCOLI','MANDARINA','FRUTILLA','DURAZNO',
+  'BANANA','CIRUELA','LIMONADA','GASEOSA','CERVEZA','HELADO','TORTA','FLAN',
+  // Animales
+  'CABALLO','CONEJO','DELFIN','PINGUINO','JIRAFA','ELEFANTE','COCODRILO',
+  'MARIPOSA','GOLONDRINA','PALOMA','CANARIO','TORTUGA','HAMSTER','CONEJO',
+  // Personas y familia
+  'ABUELITA','FAMILIA','AMISTAD','VECINOS','MAESTRO','MEDICO','ENFERMERO',
+  'BOMBERO','POLICIA','COCINERO','CARPINTERO','PLOMERO','JARDINERO',
+  // Lugares
+  'HOSPITAL','FARMACIA','TEMPLO','MERCADO','ESCUELA','BIBLIOTECA',
+  'PANADERIA','CARNICERIA','PELUQUERIA','FERRETERIA','SUPERMERCADO',
+  'AEROPUERTO','ESTACION','TERMINAL','MUNICIPIO','COMISARIA',
+  // Actividades
+  'GIMNASIA','NATACION','CICLISMO','JARDINERIA','COSTURA','TEJIDO',
+  'PINTURA','MUSICA','LECTURA','COCINAR','BAILAR','CANTAR','CAMINAR',
+  // Ropa
+  'CAMPERA','PANTALON','VESTIDO','BUFANDA','GUANTES','ZAPATILLAS',
+  'SANDALIAS','SOMBRERO','CORBATA','CINTURON','PIJAMA','DELANTAL',
+  // Transporte
+  'COLECTIVO','BICICLETA','MOTOCICLETA','HELICOPTERO','AMBULANCIA',
+  'CAMIONETA','TRANVIA','BARCO','VELERO','LANCHA','AVIONETA',
+  // Meses y dias
+  'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO',
+  'SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE',
+  'LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO',
+  // Colores y formas
+  'AMARILLO','NARANJA','VIOLETA','CELESTE','MARRON','PLATEADO','DORADO',
+  'CIRCULO','CUADRADO','TRIANGULO','RECTANGULO','ESTRELLA','CORAZON',
+  // Paises y ciudades
+  'ARGENTINA','BRASIL','MEXICO','COLOMBIA','ESPANA','ITALIA','FRANCIA',
+  'ALEMANIA','PORTUGAL','AUSTRALIA','CANADA','JAPON','CHINA','INDIA',
+  'BUENOS AIRES','CORDOBA','ROSARIO','MENDOZA','TUCUMAN','SALTA',
 ];
 
 const MAX_ERRORES = 6;
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 function getRandomWord(): string {
-  const filtered = PALABRAS.filter(p => p.length >= 6 && p.length <= 9);
+  const filtered = PALABRAS.filter(p => p.length >= 5 && p.length <= 12);
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
@@ -144,6 +179,7 @@ export default function AhorcadoScreen() {
   const [errores, setErrores] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [ganó, setGanó] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   const initGame = () => {
     setPalabra(getRandomWord());
@@ -182,7 +218,7 @@ export default function AhorcadoScreen() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Completar palabras" subtitle="Descubrí la palabra letra por letra" showBack />
+      <AppHeader title="Ahorcado" subtitle="Descubrí la palabra letra por letra" showBack />
 
       {/* Stats */}
       <View style={styles.statsRow}>
@@ -269,6 +305,25 @@ export default function AhorcadoScreen() {
         </TouchableOpacity>
 
       </ScrollView>
+
+      {/* Tutorial */}
+      <Modal visible={showTutorial} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalIcon}>🪢</Text>
+            <Text style={styles.modalTitle}>¿Cómo se juega?</Text>
+            <Text style={styles.modalSub}>
+              Hay una palabra secreta escondida.{'\n\n'}
+              Tocá las letras del teclado para adivinarla de a una.{'\n\n'}
+              Si la letra está en la palabra, aparece en su lugar. Si no, se dibuja una parte del ahorcado.{'\n\n'}
+              Tenés <Text style={{ fontWeight: 'bold', color: Colors.textPrimary }}>6 errores</Text> antes de perder.
+            </Text>
+            <TouchableOpacity style={styles.modalBtnPrimary} onPress={() => setShowTutorial(false)}>
+              <Text style={styles.modalBtnPrimaryText}>¡Entendido, a jugar!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal resultado */}
       <Modal visible={gameOver} transparent animationType="fade">

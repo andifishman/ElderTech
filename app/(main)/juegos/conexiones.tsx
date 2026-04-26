@@ -2,19 +2,19 @@ import AppHeader from '@/components/ui/AppHeader';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Pool de grupos ───────────────────────────────────────────────────────────
 const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
-  { category: 'Frutas',             color: '#4CAF50', items: ['Manzana','Pera','Sandia','Pina','Durazno','Naranja','Uva','Frutilla','Melon','Limon','Banana','Ciruela','Kiwi','Mango','Cereza'] },
+  { category: 'Frutas',             color: '#4CAF50', items: ['Manzana','Pera','Sandía','Piña','Durazno','Naranja','Uva','Frutilla','Melón','Limón','Banana','Ciruela','Kiwi','Mango','Cereza'] },
   { category: 'Verduras',           color: '#8BC34A', items: ['Zanahoria','Lechuga','Tomate','Cebolla','Papa','Zapallo','Brocoli','Espinaca','Ajo','Acelga','Apio','Pepino','Berenjena','Choclo','Remolacha'] },
   { category: 'Animales',           color: '#FF9800', items: ['Perro','Gato','Leon','Tigre','Elefante','Jirafa','Delfin','Pinguino','Tortuga','Caballo','Conejo','Oso','Lobo','Mono','Vaca'] },
   { category: 'Animales del mar',   color: '#0097A7', items: ['Tiburon','Pulpo','Ballena','Cangrejo','Medusa','Calamar','Langosta','Estrella de mar','Foca','Morsa'] },
@@ -22,8 +22,8 @@ const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
   { category: 'Deportes',           color: '#2196F3', items: ['Futbol','Basquet','Tenis','Voley','Natacion','Ciclismo','Boxeo','Rugby','Golf','Atletismo','Handball','Polo','Esgrima','Remo','Judo'] },
   { category: 'Deportes de invierno', color: '#5C6BC0', items: ['Ski','Snowboard','Patinaje','Hockey sobre hielo','Biathlon','Curling','Trineo','Salto en ski'] },
   { category: 'Paises de America',  color: '#F44336', items: ['Argentina','Brasil','Mexico','Colombia','Chile','Peru','Venezuela','Bolivia','Uruguay','Paraguay','Cuba','Ecuador'] },
-  { category: 'Paises de Europa',   color: '#E53935', items: ['Francia','Italia','Espana','Alemania','Portugal','Grecia','Suecia','Noruega','Polonia','Holanda','Belgica','Suiza'] },
-  { category: 'Paises de Asia',     color: '#C62828', items: ['Japon','China','India','Corea','Tailandia','Vietnam','Indonesia','Turquia','Arabia','Israel','Iran','Pakistan'] },
+  { category: 'Paises de Europa',   color: '#E53935', items: ['Francia','Italia','España','Alemania','Portugal','Grecia','Suecia','Noruega','Polonia','Holanda','Bélgica','Suiza'] },
+  { category: 'Paises de Asia',     color: '#C62828', items: ['Japon','China','India','Corea','Tailandia','Vietnam','Indonesia','Turquia','Arabia','Israel','Perú','Pakistan'] },
   { category: 'Capitales',          color: '#AD1457', items: ['Buenos Aires','Paris','Roma','Madrid','Berlin','Londres','Tokio','Moscu','Lima','Bogota','Santiago','Brasilia'] },
   { category: 'Instrumentos',       color: '#00BCD4', items: ['Guitarra','Piano','Violin','Flauta','Bateria','Trompeta','Arpa','Acordeon','Bajo','Bombo','Saxofon','Clarinete','Cello','Oboe','Mandolina'] },
   { category: 'Transportes',        color: '#607D8B', items: ['Auto','Tren','Avion','Barco','Bicicleta','Moto','Colectivo','Helicoptero','Tranvia','Subte','Camion','Lancha','Velero','Taxi','Ambulancia'] },
@@ -33,7 +33,7 @@ const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
   { category: 'Meses del año',      color: '#009688', items: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'] },
   { category: 'Dias de la semana',  color: '#00796B', items: ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'] },
   { category: 'Colores',            color: '#9C27B0', items: ['Rojo','Azul','Verde','Amarillo','Naranja','Rosa','Celeste','Marron','Blanco','Negro','Violeta','Gris','Dorado','Plateado'] },
-  { category: 'Partes del cuerpo',  color: '#FF5722', items: ['Cabeza','Brazo','Pierna','Mano','Pie','Espalda','Cuello','Rodilla','Codo','Hombro','Tobillo','Muneca','Cadera','Pecho','Frente'] },
+  { category: 'Partes del cuerpo',  color: '#FF5722', items: ['Cabeza','Brazo','Pierna','Mano','Pie','Espalda','Cuello','Rodilla','Codo','Hombro','Tobillo','Muñeca','Cadera','Pecho','Frente'] },
   { category: 'Comidas argentinas', color: '#FFC107', items: ['Milanesa','Empanada','Asado','Locro','Choripan','Medialunas','Alfajor','Dulce de leche','Mate','Facturas'] },
   { category: 'Comidas del mundo',  color: '#FFB300', items: ['Pizza','Sushi','Tacos','Hamburguesa','Pasta','Paella','Curry','Crepes','Falafel','Ramen'] },
   { category: 'Postres',            color: '#F06292', items: ['Helado','Torta','Flan','Brownie','Tiramisu','Mousse','Budín','Cheesecake','Panqueque','Arroz con leche'] },
@@ -41,7 +41,7 @@ const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
   { category: 'Ropa',               color: '#7E57C2', items: ['Camisa','Pantalon','Vestido','Falda','Abrigo','Bufanda','Gorro','Zapatos','Medias','Remera','Campera','Corbata','Cinturon','Guantes'] },
   { category: 'Muebles',            color: '#8D6E63', items: ['Silla','Mesa','Cama','Sofa','Armario','Escritorio','Estante','Sillon','Comoda','Ropero'] },
   { category: 'Electrodomesticos',  color: '#546E7A', items: ['Heladera','Microondas','Lavarropas','Televisor','Licuadora','Tostadora','Aspiradora','Plancha','Cafetera','Horno'] },
-  { category: 'Partes de la casa',  color: '#6D4C41', items: ['Cocina','Bano','Dormitorio','Sala','Garage','Jardin','Balcon','Terraza','Sotano','Pasillo'] },
+  { category: 'Partes de la casa',  color: '#6D4C41', items: ['Cocina','Baño','Dormitorio','Sala','Garage','Jardín','Balcón','Terraza','Sótano','Pasillo'] },
   { category: 'Numeros',            color: '#1565C0', items: ['Uno','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho','Nueve','Diez'] },
   { category: 'Formas',             color: '#283593', items: ['Circulo','Cuadrado','Triangulo','Rectangulo','Estrella','Rombo','Ovalo','Pentagono','Hexagono','Cruz'] },
   { category: 'Materiales',         color: '#4E342E', items: ['Madera','Metal','Vidrio','Plastico','Tela','Papel','Piedra','Cemento','Cuero','Goma'] },
@@ -51,7 +51,7 @@ const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
   { category: 'Peliculas clasicas', color: '#C2185B', items: ['Titanic','Bambi','Pinocho','Cenicienta','Blancanieves','El Padrino','Casablanca','Grease','Rocky','Superman'] },
   { category: 'Cosas del campo',    color: '#558B2F', items: ['Tractor','Vaca','Gallina','Trigo','Maiz','Molino','Estancia','Gaucho','Boleadoras','Mate'] },
   { category: 'Cosas del mar',      color: '#0277BD', items: ['Ola','Arena','Concha','Faro','Ancla','Red','Pesca','Coral','Alga','Marea'] },
-  { category: 'Estaciones del año', color: '#F57F17', items: ['Primavera','Verano','Otono','Invierno'] },
+  { category: 'Estaciones del año', color: '#F57F17', items: ['Primavera','Verano','Otoño','Invierno'] },
   { category: 'Signos del zodiaco', color: '#6A1B9A', items: ['Aries','Tauro','Geminis','Cancer','Leo','Virgo','Libra','Escorpio','Sagitario','Capricornio','Acuario','Piscis'] },
   { category: 'Cosas de la escuela', color: '#0288D1', items: ['Lapiz','Goma','Regla','Cuaderno','Mochila','Tijera','Pegamento','Compas','Marcador','Carpeta'] },
 ];
@@ -88,6 +88,7 @@ export default function ConexionesScreen() {
   const [mistakes, setMistakes] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [won, setWon] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   const initGame = useCallback(() => {
     const picked = pickGroups();
@@ -149,16 +150,6 @@ export default function ConexionesScreen() {
 
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
-        {/* Explicacion */}
-        <View style={styles.instructionBox}>
-          <Text style={styles.instructionTitle}>¿Como se juega?</Text>
-          <Text style={styles.instructionText}>
-            Hay 16 palabras en la pantalla. Estan divididas en 4 grupos secretos de 4 palabras cada uno.{'\n\n'}
-            Toca 4 palabras que creas que van juntas y presiona <Text style={styles.bold}>Confirmar</Text>. Si acertaste, el grupo se revela. Si te equivocas, perdes un intento.{'\n\n'}
-            Tenes <Text style={styles.bold}>4 intentos</Text> antes de perder. ¡Buena suerte!
-          </Text>
-        </View>
-
         {/* Vidas */}
         <View style={styles.livesRow}>
           <Text style={styles.livesLabel}>Intentos: </Text>
@@ -211,6 +202,22 @@ export default function ConexionesScreen() {
         </TouchableOpacity>
 
       </ScrollView>
+
+      {/* Tutorial */}
+      <Modal visible={showTutorial} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalIcon}>🔗</Text>
+            <Text style={styles.modalTitle}>¿Cómo se juega?</Text>
+            <View style={styles.answersBox}>
+              <Text style={styles.instructionText}>Hay 16 palabras divididas en 4 grupos secretos de 4 palabras cada uno.{'\n\n'}Tocá 4 palabras que creas que van juntas y presioná <Text style={styles.bold}>Confirmar</Text>.{'\n\n'}Si acertás, el grupo se revela. Si te equivocás, perdés un intento.{'\n\n'}Tenés <Text style={styles.bold}>4 intentos</Text> antes de perder.</Text>
+            </View>
+            <TouchableOpacity style={styles.modalBtnPrimary} onPress={() => setShowTutorial(false)}>
+              <Text style={styles.modalBtnPrimaryText}>¡Entendido, a jugar!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal resultado */}
       <Modal visible={showModal} transparent animationType="fade">

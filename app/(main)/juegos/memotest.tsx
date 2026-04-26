@@ -50,13 +50,14 @@ export default function MemotestScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [screen, setScreen] = useState<Screen>('difficulty');
-  const [selectedDiff, setSelectedDiff] = useState(DIFFICULTIES[1]); // Normal por defecto
+  const [selectedDiff, setSelectedDiff] = useState(DIFFICULTIES[1]);
   const [cards, setCards] = useState<Card[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [pairs, setPairs] = useState(0);
   const [won, setWon] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   const initGame = (diff = selectedDiff) => {
     const emojis = getEmojis(diff.pairs);
@@ -114,7 +115,6 @@ export default function MemotestScreen() {
   const cardSize = selectedDiff.pairs <= 6 ? 80 : selectedDiff.pairs <= 10 ? 66 : 58;
   const emojiSize = selectedDiff.pairs <= 6 ? 38 : selectedDiff.pairs <= 10 ? 30 : 26;
 
-  // ── Pantalla de selección de dificultad ──────────────────────────────────
   if (screen === 'difficulty') {
     return (
       <View style={styles.container}>
@@ -155,6 +155,24 @@ export default function MemotestScreen() {
             <Text style={styles.startBtnText}>▶  Empezar juego</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        {/* Tutorial */}
+        <Modal visible={showTutorial} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.winIcon}>🃏</Text>
+              <Text style={styles.winTitle}>¿Cómo se juega?</Text>
+              <Text style={styles.winSub}>
+                Se muestran cartas boca abajo con emojis.{'\n\n'}
+                Tocá dos cartas para darlas vuelta. Si tienen el mismo emoji, ¡encontraste un par!{'\n\n'}
+                Encontrá todos los pares para ganar. Elegí la dificultad según cuántos pares querés.
+              </Text>
+              <TouchableOpacity style={[styles.winBtnPrimary, { backgroundColor: Colors.primary }]} onPress={() => setShowTutorial(false)}>
+                <Text style={styles.winBtnPrimaryText}>¡Entendido, a jugar!</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
