@@ -1,10 +1,30 @@
-import React, { useState, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, TextInput, KeyboardAvoidingView, Platform,
-} from 'react-native';
 import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { Audio } from 'expo-av';
+import React, { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// ─── Groq API key ─────────────────────────────────────────────────────────────
+// Poné tu key en .env: EXPO_PUBLIC_GROQ_API_KEY=gsk_...
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY ?? '';
+
+const SYSTEM_PROMPT = `Sos un asistente para personas mayores.
+Respondé siempre en español, con frases muy cortas y simples.
+Usá palabras fáciles, sin tecnicismos.
+Máximo 3 oraciones por respuesta.
+Si das pasos, usá números (1, 2, 3).
+Sé amable y paciente.`;
 
 interface Message {
   id: string;
@@ -13,49 +33,159 @@ interface Message {
 }
 
 const FAQ = [
-  { q: '¿Cómo hago una videollamada?', a: 'Para hacer una videollamada:\n1. Abrí WhatsApp\n2. Tocá el contacto\n3. Tocá el ícono de cámara\n4. Esperá que atiendan' },
-  { q: '¿Cómo veo mis fotos?', a: 'Para ver tus fotos:\n1. Buscá la app "Galería" o "Fotos"\n2. Tocá para abrirla\n3. Ahí vas a ver todas tus fotos' },
-  { q: '¿Cómo uso el correo electrónico?', a: 'Para usar el correo:\n1. Abrí la app de correo\n2. Tocá "Redactar" o el ícono de lápiz\n3. Escribí el destinatario y el mensaje\n4. Tocá "Enviar"' },
-  { q: '¿Cómo subo el volumen?', a: 'Para subir el volumen:\n1. Buscá los botones en el costado del celular\n2. El botón de arriba sube el volumen\n3. El de abajo lo baja' },
+  { q: '¿Cómo hago una videollamada?' },
+  { q: '¿Cómo veo mis fotos?' },
+  { q: '¿Cómo subo el volumen?' },
+  { q: '¿Cómo uso WhatsApp?' },
 ];
 
-const botResponses: Record<string, string> = {
-  'hola': '¡Hola! Soy tu asistente. ¿En qué te puedo ayudar?',
-  'gracias': '¡De nada! Estoy aquí para ayudarte 😊',
-  'whatsapp': 'Para usar WhatsApp:\n1. Abrí WhatsApp\n2. Tocá el contacto\n3. Escribí tu mensaje\n4. Tocá para enviar',
-};
+async function askGroq(userMessage: string, history: Message[]): Promise<string> {
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...history.slice(-6).map((m) => ({
+      role: m.isBot ? 'assistant' : 'user',
+      content: m.text,
+    })),
+    { role: 'user', content: userMessage },
+  ];
 
-function getBotResponse(text: string): string {
-  const lower = text.toLowerCase();
-  for (const [key, val] of Object.entries(botResponses)) {
-    if (lower.includes(key)) return val;
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages,
+      max_tokens: 150,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Error ${res.status}: ${err}`);
   }
-  for (const faq of FAQ) {
-    if (lower.includes(faq.q.toLowerCase().slice(0, 10))) return faq.a;
+  const data = await res.json() as { choices?: { message?: { content?: string } }[] };
+  return data.choices?.[0]?.message?.content?.trim() ?? 'No pude responder. Intentá de nuevo.';
+}
+
+async function transcribeAudio(uri: string): Promise<string> {
+  console.log('API KEY:', GROQ_API_KEY.slice(0, 10) + '...');
+  const formData = new FormData();
+  formData.append('file', { uri, name: 'audio.m4a', type: 'audio/m4a' } as any);
+  formData.append('model', 'whisper-large-v3-turbo');
+  formData.append('language', 'es');
+  formData.append('response_format', 'json');
+
+  const res = await (fetch as any)('https://api.groq.com/openai/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${GROQ_API_KEY}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Error transcripción ${res.status}: ${err}`);
   }
-  return 'Entendí tu pregunta. Te recomiendo revisar la sección de Artículos donde encontrarás guías paso a paso. ¿Hay algo más en lo que pueda ayudarte?';
+  const data = await res.json() as { text?: string };
+  return data.text?.trim() ?? '';
 }
 
 export default function AsistenteScreen() {
   const scrollRef = useRef<ScrollView>(null);
+  const insets = useSafeAreaInsets();
+  const recordingRef = useRef<Audio.Recording | null>(null);
+
   const [messages, setMessages] = useState<Message[]>([
-    { id: '0', text: '¡Hola! Soy tu asistente. ¿En qué te puedo ayudar?', isBot: true },
+    { id: '0', text: '¡Hola! Soy tu asistente. ¿En qué te puedo ayudar hoy?', isBot: true },
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
 
-  const sendMessage = (text: string) => {
-    if (!text.trim()) return;
-    const userMsg: Message = { id: Date.now().toString(), text, isBot: false };
-    const botMsg: Message = { id: (Date.now() + 1).toString(), text: getBotResponse(text), isBot: true };
-    setMessages((prev) => [...prev, userMsg, botMsg]);
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || loading) return;
+
+    const userMsg: Message = { id: Date.now().toString(), text: text.trim(), isBot: false };
+    setMessages((prev) => [...prev, userMsg]);
     setInput('');
+    setLoading(true);
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+
+    try {
+      const reply = await askGroq(text.trim(), [...messages, userMsg]);
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 1).toString(), text: reply, isBot: true },
+      ]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error desconocido';
+      setMessages((prev) => [
+        ...prev,
+        { id: (Date.now() + 1).toString(), text: `Error: ${msg}`, isBot: true },
+      ]);
+    } finally {
+      setLoading(false);
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+    }
   };
+
+  const startRecording = async () => {
+    try {
+      const { granted } = await Audio.requestPermissionsAsync();
+      if (!granted) return;
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording: rec } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      recordingRef.current = rec;
+      setRecording(true);
+    } catch (e) {
+      console.error('Error al grabar:', e);
+    }
+  };
+
+  const stopRecording = async () => {
+    if (!recordingRef.current) return;
+    setRecording(false);
+    setTranscribing(true);
+
+    try {
+      await recordingRef.current.stopAndUnloadAsync();
+      const uri = recordingRef.current.getURI();
+      recordingRef.current = null;
+
+      if (!uri) throw new Error('No se obtuvo el archivo de audio');
+
+      const transcribed = await transcribeAudio(uri);
+      if (transcribed) {
+        await sendMessage(transcribed);
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Error desconocido';
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now().toString(), text: `Error de audio: ${msg}`, isBot: true },
+      ]);
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
+  const isBusy = loading || transcribing;
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <AppHeader title="Asistente" subtitle="Preguntá lo que necesitás" showBack />
 
@@ -65,10 +195,7 @@ export default function AsistenteScreen() {
         showsVerticalScrollIndicator={false}
       >
         {messages.map((msg) => (
-          <View
-            key={msg.id}
-            style={[styles.bubble, msg.isBot ? styles.botBubble : styles.userBubble]}
-          >
+          <View key={msg.id} style={[styles.bubble, msg.isBot ? styles.botBubble : styles.userBubble]}>
             {msg.isBot && <Text style={styles.botIcon}>🤖</Text>}
             <View style={[styles.bubbleContent, msg.isBot ? styles.botContent : styles.userContent]}>
               <Text style={[styles.bubbleText, msg.isBot ? styles.botText : styles.userText]}>
@@ -78,7 +205,15 @@ export default function AsistenteScreen() {
           </View>
         ))}
 
-        {/* FAQ section */}
+        {(isBusy) && (
+          <View style={[styles.bubble, styles.botBubble]}>
+            <Text style={styles.botIcon}>🤖</Text>
+            <View style={[styles.bubbleContent, styles.botContent]}>
+              <ActivityIndicator color={Colors.primary} size="small" />
+            </View>
+          </View>
+        )}
+
         <View style={styles.faqSection}>
           <Text style={styles.faqTitle}>Preguntas frecuentes:</Text>
           {FAQ.map((faq, i) => (
@@ -86,6 +221,8 @@ export default function AsistenteScreen() {
               key={i}
               style={styles.faqBtn}
               onPress={() => sendMessage(faq.q)}
+              disabled={isBusy}
+              activeOpacity={0.7}
             >
               <Text style={styles.faqIcon}>❓</Text>
               <Text style={styles.faqText}>{faq.q}</Text>
@@ -94,22 +231,49 @@ export default function AsistenteScreen() {
         </View>
       </ScrollView>
 
-      {/* Input */}
-      <View style={styles.inputRow}>
+      <View style={[styles.inputRow, { paddingBottom: insets.bottom + Spacing.sm }]}>
         <TextInput
           style={styles.input}
           placeholder="Escribí tu pregunta..."
           value={input}
           onChangeText={setInput}
           multiline
+          editable={!isBusy}
+          returnKeyType="send"
+          onSubmitEditing={() => sendMessage(input)}
         />
-        <TouchableOpacity style={styles.micBtn}>
-          <Text style={styles.micIcon}>🎤</Text>
+
+        {/* Botón micrófono */}
+        <TouchableOpacity
+          style={[styles.micBtn, recording && styles.micBtnActive]}
+          onPress={recording ? stopRecording : startRecording}
+          disabled={isBusy && !recording}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.micIcon}>{recording ? '⏹' : '🎤'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.sendBtn} onPress={() => sendMessage(input)}>
+
+        {/* Botón enviar */}
+        <TouchableOpacity
+          style={[styles.sendBtn, (!input.trim() || isBusy) && styles.sendBtnDisabled]}
+          onPress={() => sendMessage(input)}
+          disabled={!input.trim() || isBusy}
+          activeOpacity={0.8}
+        >
           <Text style={styles.sendIcon}>▶</Text>
         </TouchableOpacity>
       </View>
+
+      {recording && (
+        <View style={styles.recordingBanner}>
+          <Text style={styles.recordingText}>🔴  Grabando... Tocá ⏹ para terminar</Text>
+        </View>
+      )}
+      {transcribing && (
+        <View style={styles.recordingBanner}>
+          <Text style={styles.recordingText}>⏳  Transcribiendo audio...</Text>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -117,6 +281,7 @@ export default function AsistenteScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   messages: { padding: Spacing.lg, gap: Spacing.md, paddingBottom: Spacing.xxl },
+
   bubble: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.sm },
   botBubble: { justifyContent: 'flex-start' },
   userBubble: { justifyContent: 'flex-end' },
@@ -124,9 +289,10 @@ const styles = StyleSheet.create({
   bubbleContent: { maxWidth: '80%', borderRadius: Radius.md, padding: Spacing.md },
   botContent: { backgroundColor: Colors.white, borderBottomLeftRadius: 4 },
   userContent: { backgroundColor: Colors.primary, borderBottomRightRadius: 4 },
-  bubbleText: { fontSize: FontSizes.md, lineHeight: 22 },
+  bubbleText: { fontSize: FontSizes.md, lineHeight: 24 },
   botText: { color: Colors.textPrimary },
   userText: { color: Colors.white },
+
   faqSection: { marginTop: Spacing.lg },
   faqTitle: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.textSecondary, marginBottom: Spacing.sm },
   faqBtn: {
@@ -137,24 +303,40 @@ const styles = StyleSheet.create({
   },
   faqIcon: { fontSize: 16 },
   faqText: { flex: 1, fontSize: FontSizes.sm, color: Colors.textPrimary },
+
   inputRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: Colors.white, padding: Spacing.md,
+    backgroundColor: Colors.white, paddingHorizontal: Spacing.md, paddingTop: Spacing.md,
     borderTopWidth: 1, borderTopColor: Colors.border,
   },
   input: {
-    flex: 1, backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder,
+    flex: 1, backgroundColor: Colors.inputBg,
+    borderWidth: 1, borderColor: Colors.inputBorder,
     borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
     fontSize: FontSizes.md, maxHeight: 80,
   },
   micBtn: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: Colors.background, borderWidth: 2, borderColor: Colors.primary,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  micBtnActive: {
+    backgroundColor: Colors.danger, borderColor: Colors.danger,
   },
   micIcon: { fontSize: 20 },
   sendBtn: {
-    width: 40, height: 40, borderRadius: 20,
+    width: 44, height: 44, borderRadius: 22,
     backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center',
   },
+  sendBtnDisabled: { opacity: 0.4 },
   sendIcon: { color: Colors.white, fontSize: 16, marginLeft: 2 },
+
+  recordingBanner: {
+    backgroundColor: Colors.dangerLight,
+    paddingVertical: Spacing.sm,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: Colors.danger,
+  },
+  recordingText: { color: Colors.danger, fontWeight: '600', fontSize: FontSizes.sm },
 });

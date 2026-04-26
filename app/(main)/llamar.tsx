@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Alert,
+    Linking,
     Modal,
     ScrollView,
     StyleSheet,
@@ -34,6 +35,29 @@ export default function LlamarScreen() {
     }
   };
 
+  const handleCall = (phone: string) => {
+    const url = `tel:${phone.replace(/\s/g, '')}`;
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'No se puede abrir la app de teléfono en este dispositivo');
+      }
+    });
+  };
+
+  const handleWhatsApp = (phone: string) => {
+    const number = phone.replace(/[\s\-\+\(\)]/g, '');
+    const url = `whatsapp://send?phone=${number}`;
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'WhatsApp no está instalado en este dispositivo');
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       <AppHeader title="Llamar" subtitle="Contactá a personas" showBack />
@@ -60,35 +84,52 @@ export default function LlamarScreen() {
 
         {filtered.map((contact) => (
           <View key={contact.id} style={styles.contactCard}>
-            <View style={styles.avatarBox}>
-              {contact.avatar ? (
-                <Image source={{ uri: contact.avatar }} style={styles.avatarImage} />
-              ) : (
-                <Text style={styles.avatarText}>{contact.name.charAt(0)}</Text>
-              )}
+            {/* Info del contacto */}
+            <View style={styles.contactTop}>
+              <View style={styles.avatarBox}>
+                {contact.avatar ? (
+                  <Image source={{ uri: contact.avatar }} style={styles.avatarImage} />
+                ) : (
+                  <Text style={styles.avatarText}>{contact.name.charAt(0)}</Text>
+                )}
+              </View>
+              <View style={styles.contactInfo}>
+                <Text style={styles.contactName}>{contact.name}</Text>
+                <Text style={styles.contactPhone}>{contact.phone}</Text>
+                {contact.relation && (
+                  <Text style={styles.contactRelation}>👤 {contact.relation}</Text>
+                )}
+              </View>
             </View>
-            <View style={styles.contactInfo}>
-              <Text style={styles.contactName}>{contact.name}</Text>
-              <Text style={styles.contactPhone}>{contact.phone}</Text>
-              {contact.relation && (
-                <Text style={styles.contactRelation}>👤 {contact.relation}</Text>
-              )}
-            </View>
+            {/* Botones en fila */}
             <View style={styles.contactActions}>
               <TouchableOpacity
-                style={styles.editBtn}
+                style={[styles.actionBtn, styles.actionBtnEdit]}
                 onPress={() => router.push({ pathname: '/(main)/llamar/editar', params: { id: contact.id } } as any)}
               >
-                <Text style={styles.editBtnText}>Editar</Text>
+                <Text style={styles.actionBtnIcon}>✏️</Text>
+                <Text style={styles.actionBtnText}>Editar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.callBtn} onPress={() => Alert.alert('Llamar', `Llamando a ${contact.name}...`)}>
-                <Text style={styles.actionIcon}>📞</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.actionBtnCall]}
+                onPress={() => handleCall(contact.phone)}
+              >
+                <Text style={styles.actionBtnIcon}>📞</Text>
+                <Text style={styles.actionBtnText}>Llamar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.whatsappBtn} onPress={() => Alert.alert('WhatsApp', `Abriendo WhatsApp para ${contact.name}...`)}>
-                <Text style={styles.actionIcon}>💬</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.actionBtnWsp]}
+                onPress={() => handleWhatsApp(contact.phone)}
+              >
+                <Text style={styles.actionBtnIcon}>💬</Text>
+                <Text style={styles.actionBtnText}>WhatsApp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteBtn} onPress={() => setDeleteId(contact.id)}>
-                <Text style={styles.deleteBtnText}>Eliminar</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.actionBtnDelete]}
+                onPress={() => setDeleteId(contact.id)}
+              >
+                <Text style={styles.actionBtnIcon}>🗑️</Text>
+                <Text style={styles.actionBtnText}>Borrar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -135,42 +176,39 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: FontSizes.lg, fontWeight: 'bold', color: Colors.textPrimary },
   contactCard: {
     backgroundColor: Colors.white, borderRadius: Radius.md,
-    padding: Spacing.md, flexDirection: 'row', alignItems: 'center',
+    padding: Spacing.md,
     shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1, shadowRadius: 3, elevation: 2, flexWrap: 'wrap', gap: Spacing.xs,
+    shadowOpacity: 0.1, shadowRadius: 3, elevation: 2,
+    gap: Spacing.md,
+  },
+  contactTop: {
+    flexDirection: 'row', alignItems: 'center',
   },
   avatarBox: {
-    width: 44, height: 44, borderRadius: 22,
+    width: 52, height: 52, borderRadius: 26,
     backgroundColor: Colors.primaryLight, alignItems: 'center',
-    justifyContent: 'center', marginRight: Spacing.sm,
+    justifyContent: 'center', marginRight: Spacing.md,
     overflow: 'hidden',
   },
-  avatarImage: { width: 44, height: 44, borderRadius: 22 },
-  avatarText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.lg },
-  contactInfo: { flex: 1, minWidth: 100 },
-  contactName: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.textPrimary },
-  contactPhone: { fontSize: FontSizes.sm, color: Colors.textSecondary },
-  contactRelation: { fontSize: FontSizes.xs, color: Colors.primary, fontWeight: '600', marginTop: 2 },
-  contactActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, flexWrap: 'wrap' },
-  editBtn: {
-    backgroundColor: Colors.info, borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.sm, paddingVertical: Spacing.xs,
+  avatarImage: { width: 52, height: 52, borderRadius: 26 },
+  avatarText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.xl },
+  contactInfo: { flex: 1 },
+  contactName: { fontSize: FontSizes.lg, fontWeight: 'bold', color: Colors.textPrimary },
+  contactPhone: { fontSize: FontSizes.md, color: Colors.textSecondary, marginTop: 2 },
+  contactRelation: { fontSize: FontSizes.sm, color: Colors.primary, fontWeight: '600', marginTop: 2 },
+  contactActions: {
+    flexDirection: 'row', gap: Spacing.xs,
   },
-  editBtnText: { color: Colors.white, fontSize: FontSizes.xs, fontWeight: '600' },
-  callBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.successLight, alignItems: 'center', justifyContent: 'center',
+  actionBtn: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    paddingVertical: Spacing.sm, borderRadius: Radius.sm, gap: 4,
   },
-  whatsappBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.successLight, alignItems: 'center', justifyContent: 'center',
-  },
-  deleteBtn: {
-    backgroundColor: Colors.danger, borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.sm, paddingVertical: Spacing.xs,
-  },
-  deleteBtnText: { color: Colors.white, fontSize: FontSizes.xs, fontWeight: '600' },
-  actionIcon: { fontSize: 18 },
+  actionBtnEdit:   { backgroundColor: Colors.info },
+  actionBtnCall:   { backgroundColor: Colors.success },
+  actionBtnWsp:    { backgroundColor: '#25D366' },
+  actionBtnDelete: { backgroundColor: Colors.danger },
+  actionBtnIcon: { fontSize: 22 },
+  actionBtnText: { color: Colors.white, fontSize: FontSizes.xs, fontWeight: '700' },
   modalOverlay: {
     flex: 1, backgroundColor: '#00000066',
     alignItems: 'center', justifyContent: 'center',
