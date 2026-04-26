@@ -19,6 +19,22 @@ export default function MasScreen() {
       <AppHeader title="Más" subtitle="Ver más opciones de la aplicación" showBack />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
+        {/* Noticias */}
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/noticias' as any)}
+        >
+          <View style={[styles.iconBox, { backgroundColor: '#FFF3E0' }]}>
+            <Text style={styles.icon}>📰</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>Noticias</Text>
+            <Text style={styles.cardSub}>Las noticias más importantes del día</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
         {/* Clima */}
         <TouchableOpacity
           style={styles.card}
@@ -59,6 +75,22 @@ export default function MasScreen() {
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Juegos</Text>
             <Text style={styles.cardSub}>Divertite con ElderTech</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
+        {/* Utilidades */}
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/utilidades' as any)}
+        >
+          <View style={[styles.iconBox, { backgroundColor: '#FFF9C4' }]}>
+            <Text style={styles.icon}>🔦</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>Utilidades</Text>
+            <Text style={styles.cardSub}>Linterna y tamaño de letra</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>

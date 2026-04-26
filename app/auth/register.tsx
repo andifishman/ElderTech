@@ -36,6 +36,8 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [floor, setFloor] = useState('');
@@ -76,7 +78,7 @@ export default function RegisterScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backArrow}>←</Text>
+            <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
           <View style={styles.logoBox}>
             <Text style={styles.logoText}>ElderTech</Text>
@@ -89,8 +91,6 @@ export default function RegisterScreen() {
           {[
             { label: 'Nombre completo *', value: fullName, setter: setFullName, placeholder: 'María García' },
             { label: 'Nombre de usuario *', value: username, setter: setUsername, placeholder: 'mariagarcia' },
-            { label: 'Contraseña *', value: password, setter: setPassword, placeholder: '••••••••', secure: true },
-            { label: 'Confirmar contraseña *', value: confirmPassword, setter: setConfirmPassword, placeholder: '••••••••', secure: true },
             { label: 'Piso / Habitación', value: floor, setter: setFloor, placeholder: 'Ej: 3A' },
           ].map((field) => (
             <View key={field.label}>
@@ -100,11 +100,40 @@ export default function RegisterScreen() {
                 placeholder={field.placeholder}
                 value={field.value}
                 onChangeText={field.setter}
-                secureTextEntry={field.secure}
                 autoCapitalize="none"
               />
             </View>
           ))}
+
+          <Text style={styles.label}>Contraseña *</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.inputFlex}
+              placeholder="••••••••"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+              <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>Confirmar contraseña *</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.inputFlex}
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(v => !v)} style={styles.eyeBtn}>
+              <Text style={styles.eyeIcon}>{showConfirmPassword ? '🙈' : '👁️'}</Text>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.label}>Correo electrónico *</Text>
           <TextInput
@@ -149,11 +178,15 @@ const styles = StyleSheet.create({
     paddingTop: 50, paddingBottom: 24, paddingHorizontal: Spacing.xl,
   },
   backBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.primaryLight,
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)',
     alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.md,
   },
-  backArrow: { color: Colors.white, fontSize: FontSizes.xl, fontWeight: 'bold' },
+  backArrow: {
+    color: Colors.white, fontSize: 34, fontWeight: '300',
+    lineHeight: 40, textAlign: 'center', marginTop: -2,
+  },
   logoBox: {
     backgroundColor: Colors.primaryLight, borderRadius: Radius.sm,
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs,
@@ -174,6 +207,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
     fontSize: FontSizes.md, color: Colors.textPrimary,
   },
+  inputRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: Colors.inputBg,
+    borderWidth: 1, borderColor: Colors.inputBorder,
+    borderRadius: Radius.sm, paddingHorizontal: Spacing.md,
+  },
+  inputFlex: {
+    flex: 1, paddingVertical: Spacing.md,
+    fontSize: FontSizes.md, color: Colors.textPrimary,
+  },
+  eyeBtn: { padding: 4 },
+  eyeIcon: { fontSize: 20 },
   inputError: { borderColor: '#E53E3E' },
   errorText: { color: '#E53E3E', fontSize: FontSizes.sm, marginTop: 4 },
   difficultyRow: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap', marginTop: Spacing.xs },

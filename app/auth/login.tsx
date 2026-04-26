@@ -29,6 +29,7 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
     if (!username || !password) {
@@ -78,9 +79,11 @@ export default function LoginScreen() {
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showPassword}
             />
-            <Text style={styles.inputIcon}>🔒</Text>
+            <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+              <Text style={styles.inputIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity onPress={() => router.push('/auth/recover')}>
@@ -140,6 +143,7 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.md, color: Colors.textPrimary,
   },
   inputIcon: { fontSize: 18, marginLeft: Spacing.sm },
+  eyeBtn: { padding: 4 },
   forgotText: {
     color: Colors.primary, fontSize: FontSizes.sm,
     marginTop: Spacing.sm, textDecorationLine: 'underline',

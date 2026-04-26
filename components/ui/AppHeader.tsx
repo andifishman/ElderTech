@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Colors, FontSizes, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface AppHeaderProps {
   title: string;
@@ -19,7 +19,7 @@ export default function AppHeader({ title, subtitle, showBack = false, rightIcon
       <View style={styles.row}>
         {showBack ? (
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backArrow}>←</Text>
+            <Text style={styles.backArrow}>‹</Text>
           </TouchableOpacity>
         ) : (
           <View style={styles.logoBox}>
@@ -48,18 +48,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.primaryLight,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.sm,
   },
   backArrow: {
     color: Colors.white,
-    fontSize: FontSizes.xl,
-    fontWeight: 'bold',
+    fontSize: 34,
+    fontWeight: '300',
+    lineHeight: 40,
+    textAlign: 'center',
+    marginTop: -2,
   },
   logoBox: {
     backgroundColor: Colors.primaryLight,
@@ -78,12 +83,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: Colors.white,
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.xxl,
     fontWeight: 'bold',
   },
   subtitle: {
     color: '#CCFFCC',
-    fontSize: FontSizes.xs,
+    fontSize: FontSizes.sm,
     marginTop: 2,
   },
   placeholder: {

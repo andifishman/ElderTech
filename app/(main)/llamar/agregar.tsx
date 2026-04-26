@@ -2,17 +2,19 @@ import AppHeader from '@/components/ui/AppHeader';
 import { COMMON_COUNTRY_CODES, COUNTRY_CODES, CountryCode, getFlagEmoji } from '@/constants/countryCodes';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useContacts } from '@/context/ContactsContext';
+import * as Contacts from 'expo-contacts';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text, TextInput, TouchableOpacity,
-    View
+  Alert,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text, TextInput, TouchableOpacity,
+  View
 } from 'react-native';
 
 const RELATIONS = ['Hijo/a', 'Nieto/a', 'Médico', 'Amigo', 'Otra...'];
@@ -29,6 +31,8 @@ export default function AgregarContactoScreen() {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCustomRelation, setShowCustomRelation] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
+  const [suggestions, setSuggestions] = useState<Contacts.Contact[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const commonCountries = useMemo(
     () => COUNTRY_CODES.filter((c) => COMMON_COUNTRY_CODES.includes(c.code)),
@@ -54,9 +58,47 @@ export default function AgregarContactoScreen() {
   );
 
   const handlePhoneChange = (text: string) => {
-    // Solo permitir números, espacios y guiones
     const cleaned = text.replace(/[^0-9\s-]/g, '');
     setPhone(cleaned);
+  };
+
+  const handleNameChange = async (text: string) => {
+    setName(text);
+    if (Platform.OS === 'web' || text.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    try {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status !== 'granted') return;
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers, Contacts.Fields.Image],
+        name: text,
+      });
+      const withPhone = data.filter((c) => c.phoneNumbers && c.phoneNumbers.length > 0);
+      setSuggestions(withPhone.slice(0, 5));
+      setShowSuggestions(withPhone.length > 0);
+    } catch {
+      // expo-contacts no disponible en Expo Go, ignorar silenciosamente
+    }
+  };
+
+  const handleSelectSuggestion = (contact: Contacts.Contact) => {
+    setName(contact.name ?? '');
+    const rawPhone = contact.phoneNumbers?.[0]?.number ?? '';
+    const cleaned = rawPhone.replace(/\s/g, '');
+    const match = cleaned.match(/^(\+\d{1,3})(.*)$/);
+    if (match) {
+      const found = COUNTRY_CODES.find((c) => c.dial_code === match[1]);
+      if (found) setCountryCode(match[1]);
+      setPhone(match[2].replace(/[^0-9\s-]/g, ''));
+    } else {
+      setPhone(rawPhone.replace(/[^0-9\s-]/g, ''));
+    }
+    if (contact.image?.uri) setAvatar(contact.image.uri);
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const handlePickImage = async () => {
@@ -75,6 +117,44 @@ export default function AgregarContactoScreen() {
       setAvatar(result.assets[0].uri);
     }
   };
+
+  const handleImportContact = async () => {
+    if (Platform.OS === 'web') {
+      Alert.alert('No disponible', 'Esta función solo está disponible en el celular.');
+      return;
+    }
+    try {
+      const contact = await Contacts.presentContactPickerAsync();
+      if (contact) {
+        handleSelectSuggestion(contact);
+      }
+    } catch {
+      // presentContactPickerAsync no funciona en Expo Go, solo en build nativo
+      Alert.alert(
+        'Solo disponible en la app instalada',
+        'Esta función funciona cuando la app está instalada como APK. Por ahora escribí el nombre para buscar entre tus contactos.'
+      );
+    }
+  };
+
+  const handleSelectPhoneContact = (contact: Contacts.Contact) => {
+    setName(contact.name ?? '');
+    const rawPhone = contact.phoneNumbers?.[0]?.number ?? '';
+    // Detectar y separar código de país si empieza con +
+    const cleaned = rawPhone.replace(/\s/g, '');
+    const match = cleaned.match(/^(\+\d{1,3})(.*)$/);
+    if (match) {
+      const found = COUNTRY_CODES.find((c) => c.dial_code === match[1]);
+      if (found) setCountryCode(match[1]);
+      setPhone(match[2].replace(/[^0-9\s-]/g, ''));
+    } else {
+      setPhone(rawPhone.replace(/[^0-9\s-]/g, ''));
+    }
+    if (contact.image?.uri) setAvatar(contact.image.uri);
+    setShowCountryPicker(false);
+  };
+
+  const filteredPhoneContacts = useMemo(() => [], []);
 
   const handleRelationSelect = (r: string) => {
     if (r === 'Otra...') {
@@ -108,6 +188,13 @@ export default function AgregarContactoScreen() {
     <View style={styles.container}>
       <AppHeader title="Llamar" subtitle="Agregar contacto" showBack />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+
+        {/* Botón importar del teléfono */}
+        <TouchableOpacity style={styles.importBtn} onPress={handleImportContact}>
+          <Text style={styles.importBtnIcon}>📋</Text>
+          <Text style={styles.importBtnText}>Importar desde mis contactos</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.avatarBox} onPress={handlePickImage}>
           {avatar ? (
             <Image source={{ uri: avatar }} style={styles.avatarImage} />
@@ -118,7 +205,24 @@ export default function AgregarContactoScreen() {
         </TouchableOpacity>
 
         <Text style={styles.label}>Nombre completo *</Text>
-        <TextInput style={styles.input} placeholder="Ej: María García" value={name} onChangeText={setName} />
+        <TextInput style={styles.input} placeholder="Ej: María García" value={name} onChangeText={handleNameChange} />
+        {showSuggestions && (
+          <View style={styles.suggestionsBox}>
+            {suggestions.map((c, i) => (
+              <TouchableOpacity
+                key={String(i)}
+                style={styles.suggestionItem}
+                onPress={() => handleSelectSuggestion(c)}
+              >
+                <Text style={styles.suggestionIcon}>👤</Text>
+                <View>
+                  <Text style={styles.suggestionName}>{c.name}</Text>
+                  <Text style={styles.suggestionPhone}>{c.phoneNumbers?.[0]?.number}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <Text style={styles.label}>Número de teléfono *</Text>
         <View style={styles.phoneRow}>
@@ -264,6 +368,29 @@ export default function AgregarContactoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   content: { padding: Spacing.xl, gap: Spacing.sm },
+  suggestionsBox: {
+    backgroundColor: Colors.white,
+    borderWidth: 1, borderColor: Colors.border,
+    borderRadius: Radius.sm,
+    marginTop: 2,
+    overflow: 'hidden',
+  },
+  suggestionItem: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    padding: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
+  },
+  suggestionIcon: { fontSize: 22 },
+  suggestionName: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.textPrimary },
+  suggestionPhone: { fontSize: FontSizes.sm, color: Colors.textSecondary },
+  importBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: Spacing.sm, backgroundColor: Colors.infoLight,
+    borderWidth: 2, borderColor: Colors.info,
+    borderRadius: Radius.sm, paddingVertical: Spacing.md,
+  },
+  importBtnIcon: { fontSize: 22 },
+  importBtnText: { color: Colors.info, fontSize: FontSizes.md, fontWeight: 'bold' },
   avatarBox: { alignItems: 'center', marginBottom: Spacing.lg },
   avatarIcon: { fontSize: 64 },
   avatarImage: { width: 90, height: 90, borderRadius: 45 },

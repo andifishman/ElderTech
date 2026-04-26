@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
 import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Spacing, Radius } from '@/constants/theme';
+import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { useLocalSearchParams } from 'expo-router';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function DetalleActividadScreen() {
   const { activity } = useLocalSearchParams<{ activity: string }>();
@@ -21,22 +21,17 @@ export default function DetalleActividadScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>📍 ¿Dónde es?</Text>
-            <Text style={styles.sectionText}>Sala Común</Text>
-            <Text style={styles.sectionSubText}>Planta baja, ala derecha y sube por las escaleras</Text>
+            <Text style={styles.sectionText}>{item.location ?? 'Sala Común'}</Text>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>📝 Descripción</Text>
-            <Text style={styles.sectionText}>
-              Aprendé a usar el celular y la tablet de forma simple.{'\n'}
-              Actividades: taller de escritura en pantalla y relatos de forma digital.
-            </Text>
+            <Text style={styles.sectionText}>{item.description ?? 'Sin descripción disponible.'}</Text>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>👨‍🏫 Instructor</Text>
-            <Text style={styles.sectionText}>Prof. Germán Lobos</Text>
-            <Text style={styles.sectionSubText}>CEO de ElderTech</Text>
+            <Text style={styles.sectionTitle}>👨‍🏫 Instructor / Responsable</Text>
+            <Text style={styles.sectionText}>{item.instructor ?? 'Personal del hogar'}</Text>
           </View>
         </View>
       </ScrollView>

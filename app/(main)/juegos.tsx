@@ -43,6 +43,30 @@ const games = [
     color: Colors.infoLight,
     iconBg: Colors.info,
   },
+  {
+    id: 'sopa',
+    icon: '🔤',
+    title: 'Sopa de letras',
+    subtitle: 'Encontrá las palabras escondidas',
+    color: Colors.orangeLight,
+    iconBg: Colors.orange,
+  },
+  {
+    id: 'sudoku',
+    icon: '🔢',
+    title: 'Sudoku',
+    subtitle: 'Completá el tablero del 1 al 9',
+    color: Colors.purpleLight,
+    iconBg: Colors.purple,
+  },
+  {
+    id: 'laberinto',
+    icon: '🌀',
+    title: 'Laberinto',
+    subtitle: 'Llegá a la salida desde el inicio',
+    color: Colors.successLight,
+    iconBg: Colors.success,
+  },
 ];
 
 export default function JuegosScreen() {
@@ -66,6 +90,12 @@ export default function JuegosScreen() {
                 router.push('/(main)/juegos/simon' as any);
               } else if (game.id === 'conexiones') {
                 router.push('/(main)/juegos/conexiones' as any);
+              } else if (game.id === 'sopa') {
+                router.push('/(main)/juegos/sopa' as any);
+              } else if (game.id === 'sudoku') {
+                router.push('/(main)/juegos/sudoku' as any);
+              } else if (game.id === 'laberinto') {
+                router.push('/(main)/juegos/laberinto' as any);
               }
             }}
             activeOpacity={0.8}
