@@ -1,7 +1,8 @@
 import AppHeader from '@/components/ui/AppHeader';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import * as Speech from 'expo-speech';
+import React, { useEffect } from 'react';
 import {
     Linking,
     Platform,
@@ -126,6 +127,18 @@ export default function ArticuloDetalleScreen() {
     Linking.openURL(article.youtubeUrl);
   };
 
+  const speakArticle = () => {
+    Speech.stop();
+    const stepsText = article.steps.join('. ');
+    Speech.speak(`${article.title}. ${article.description}. Los pasos son: ${stepsText}`, { language: 'es-AR', rate: 0.9 });
+  };
+
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
       <AppHeader title="Artículos" subtitle={article.title} showBack />
@@ -141,6 +154,11 @@ export default function ArticuloDetalleScreen() {
 
         <Text style={styles.title}>{article.title}</Text>
         <Text style={styles.meta}>{article.type} · {article.duration}</Text>
+
+        {/* Botón escuchar */}
+        <TouchableOpacity style={styles.audioBtn} onPress={speakArticle} activeOpacity={0.8}>
+          <Text style={styles.audioBtnText}>🔊  Escuchar título y descripción</Text>
+        </TouchableOpacity>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📝 Descripción</Text>
@@ -223,7 +241,14 @@ const styles = StyleSheet.create({
   },
 
   title: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: 4 },
-  meta: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginBottom: Spacing.lg },
+  meta: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginBottom: Spacing.md },
+  audioBtn: {
+    backgroundColor: Colors.successLight,
+    borderWidth: 2, borderColor: Colors.success,
+    borderRadius: Radius.sm, paddingVertical: Spacing.md,
+    alignItems: 'center', marginBottom: Spacing.lg,
+  },
+  audioBtnText: { color: Colors.success, fontSize: FontSizes.md, fontWeight: 'bold' },
   section: { marginBottom: Spacing.lg },
   sectionTitle: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.primary, marginBottom: Spacing.sm },
   sectionText: { fontSize: FontSizes.md, color: Colors.textPrimary, lineHeight: 24 },

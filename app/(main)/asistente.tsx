@@ -3,17 +3,20 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { Audio } from 'expo-av';
 import React, { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const STORAGE_KEY = 'asistente_historial';
 
 // ─── Groq API key ─────────────────────────────────────────────────────────────
 // Poné tu key en .env: EXPO_PUBLIC_GROQ_API_KEY=gsk_...
@@ -103,6 +106,7 @@ export default function AsistenteScreen() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
 
@@ -274,6 +278,24 @@ export default function AsistenteScreen() {
           <Text style={styles.recordingText}>⏳  Transcribiendo audio...</Text>
         </View>
       )}
+      {/* Tutorial */}
+      <Modal visible={showTutorial} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalIcon}>🤖</Text>
+            <Text style={styles.modalTitle}>¿Cómo usar el Asistente?</Text>
+            <View style={styles.tutorialList}>
+              <Text style={styles.tutorialItem}>✍️ Escribí tu pregunta en el cuadro de abajo y tocá el botón enviar</Text>
+              <Text style={styles.tutorialItem}>🎤 También podés grabar tu voz tocando el micrófono</Text>
+              <Text style={styles.tutorialItem}>❓ O tocá una de las preguntas frecuentes para empezar</Text>
+              <Text style={styles.tutorialItem}>💬 El asistente te va a responder de forma simple y clara</Text>
+            </View>
+            <TouchableOpacity style={styles.tutorialBtn} onPress={() => setShowTutorial(false)}>
+              <Text style={styles.tutorialBtnText}>¡Entendido, empezar!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -330,6 +352,23 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: { opacity: 0.4 },
   sendIcon: { color: Colors.white, fontSize: 16, marginLeft: 2 },
+  modalOverlay: {
+    flex: 1, backgroundColor: '#00000066',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  modalBox: {
+    backgroundColor: Colors.white, borderRadius: Radius.lg,
+    padding: Spacing.xxl, width: '88%', alignItems: 'center',
+  },
+  modalIcon: { fontSize: 64, marginBottom: Spacing.md },
+  modalTitle: { fontSize: FontSizes.xxl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.md, textAlign: 'center' },
+  tutorialList: { width: '100%', gap: Spacing.sm, marginBottom: Spacing.xl },
+  tutorialItem: { fontSize: FontSizes.md, color: Colors.textPrimary, lineHeight: 24 },
+  tutorialBtn: {
+    backgroundColor: Colors.primary, borderRadius: Radius.sm,
+    paddingVertical: Spacing.md, width: '100%', alignItems: 'center',
+  },
+  tutorialBtnText: { color: Colors.white, fontSize: FontSizes.lg, fontWeight: 'bold' },
 
   recordingBanner: {
     backgroundColor: Colors.dangerLight,
