@@ -4,12 +4,12 @@ import { useRouter } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useState } from 'react';
 import {
-  Dimensions,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text, TouchableOpacity,
-  View
+    Dimensions,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,7 +27,7 @@ const menuItems = [
     audio: 'Llamar. Desde acá podés llamar o escribirle por WhatsApp a tu familia y amigos.',
   },
   { 
-    id: 'articulos', icon: '📚', label: 'Artículos', 
+    id: 'articulos', icon: '📚', label: 'Tutoriales', 
     subtitle: 'Aprendé con videos', color: '#F0E5FF', iconBg: '#CC99FF', size: 'medium',
     audio: 'Artículos. Encontrás guías y videos para aprender a usar el celular paso a paso.',
   },
@@ -43,11 +43,24 @@ const menuItems = [
   },
 ];
 
+const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+function getFechaHoy() {
+  const hoy = new Date();
+  const diaSemana = DIAS[hoy.getDay()];
+  const diaMes = hoy.getDate();
+  const mes = MESES[hoy.getMonth()];
+  const anio = hoy.getFullYear();
+  return `${diaSemana} ${diaMes} de ${mes} de ${anio}`;
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
   const insets = useSafeAreaInsets();
+  const fecha = getFechaHoy();
 
   const speak = (text: string) => {
     Speech.stop();
@@ -66,10 +79,7 @@ export default function HomeScreen() {
         <View style={styles.headerRow}>
           <View style={styles.logoContainer}>
             <Text style={styles.logoIcon}>🌉</Text>
-            <View>
-              <Text style={styles.logoText}>ElderTech</Text>
-              <Text style={styles.logoSubtext}>El puente que necesitás</Text>
-            </View>
+            <Text style={styles.logoText}>ElderTech</Text>
           </View>
           <TouchableOpacity onPress={() => setShowLogout(true)} style={styles.avatarBtn}>
             <Text style={styles.avatarIcon}>👤</Text>
@@ -79,8 +89,7 @@ export default function HomeScreen() {
 
       {/* Welcome Section */}
       <View style={styles.welcomeSection}>
-        <Text style={styles.welcome}>¡Bienvenido/a {user?.fullName?.split(' ')[0] ?? 'Marta'}</Text>
-        <Text style={styles.welcomeSub}>¿Qué querés hacer hoy?</Text>
+        <Text style={styles.welcome}>Hola, hoy es {fecha}</Text>
       </View>
 
       {/* Menu Grid */}
@@ -202,11 +211,11 @@ const styles = StyleSheet.create({
   // Header Styles
   header: {
     backgroundColor: '#4CAF50',
-    paddingTop: 50, 
-    paddingBottom: 20, 
+    paddingTop: 14,
+    paddingBottom: 6,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
   },
   headerRow: {
     flexDirection: 'row', 
@@ -216,6 +225,10 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+  },
+  logoIcon: {
+    fontSize: 32,
   },
   logoIcon: {
     fontSize: 32,
@@ -224,11 +237,7 @@ const styles = StyleSheet.create({
   logoText: { 
     color: Colors.white, 
     fontWeight: 'bold', 
-    fontSize: 28 
-  },
-  logoSubtext: {
-    color: '#E8F5E8',
-    fontSize: 16,
+    fontSize: 34,
   },
   avatarBtn: {
     width: 40, 
@@ -251,7 +260,7 @@ const styles = StyleSheet.create({
   },
   welcome: { 
     color: '#2E3A59', 
-    fontSize: 26, 
+    fontSize: 32, 
     fontWeight: 'bold',
     marginBottom: 4,
   },
@@ -275,7 +284,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-    minHeight: 140,
+    minHeight: 200,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   largeCardTopBar: {
     height: 6,
@@ -312,8 +323,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   largeCardBottom: {
-    alignItems: 'flex-end',
-    marginTop: 10,
+    padding: 12,
+    paddingTop: 4,
   },
   audioBtn: {
     backgroundColor: 'rgba(0,0,0,0.12)',
@@ -360,7 +371,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-    minHeight: 170,
+    minHeight: 260,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   mediumCardTopBar: {
     height: 6,
@@ -368,13 +381,14 @@ const styles = StyleSheet.create({
   },
   mediumCardInner: {
     padding: 16,
+    paddingBottom: 8,
     flex: 1,
   },
   mediumCardContent: {
     flex: 1,
   },
   mediumCardLabel: { 
-    fontSize: 22, 
+    fontSize: 26, 
     fontWeight: 'bold', 
     color: '#2E3A59',
     marginBottom: 6,
@@ -386,20 +400,20 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   mediumIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   mediumCardIcon: { 
-    fontSize: 22,
+    fontSize: 26,
   },
   mediumCardBottom: {
-    alignItems: 'flex-end',
     padding: 12,
     paddingTop: 0,
+    width: '100%',
   },
   smallSpeakerCircle: {
     width: 38,

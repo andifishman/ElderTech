@@ -75,7 +75,7 @@ const scheduleData: Record<string, Array<{ time: string; icon: string; activity:
   // Domingo
   '2025-04-13': [
     { time: '08:00', endTime: '09:30', icon: '🍳', activity: 'Desayuno', description: 'Desayuno especial de domingo con medialunas y facturas.', location: 'Comedor principal, planta baja', instructor: 'Personal de cocina' },
-    { time: '10:00', endTime: '12:00', icon: '⛪', activity: 'Misa / Momento espiritual', description: 'Celebración religiosa opcional. También hay espacio de meditación y reflexión.', location: 'Capilla o sala de estar', instructor: 'Padre Martín López' },
+    { time: '10:00', endTime: '12:00', icon: '✡️', activity: 'Templo / Momento espiritual', description: 'Celebración religiosa opcional. También hay espacio de meditación y reflexión.', location: 'Templo o sala de estar', instructor: 'Rabino' },
     { time: '12:30', endTime: '14:00', icon: '🍽️', activity: 'Almuerzo especial', description: 'Almuerzo especial de domingo con menú ampliado y postre.', location: 'Comedor principal, planta baja', instructor: 'Personal de cocina' },
     { time: '14:00', endTime: '17:00', icon: '👨‍👩‍👧', activity: 'Visitas familiares', description: 'Horario extendido de visitas de domingo. Familiares bienvenidos.', location: 'Sala de visitas y jardín', instructor: 'Personal de guardia' },
     { time: '17:00', endTime: '17:30', icon: '🥐', activity: 'Merienda', description: 'Merienda especial de domingo.', location: 'Comedor principal, planta baja', instructor: 'Personal de cocina' },

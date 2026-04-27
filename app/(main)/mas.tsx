@@ -3,10 +3,10 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  ScrollView,
-  StyleSheet,
-  Text, TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text, TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,7 +16,7 @@ export default function MasScreen() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Más" subtitle="Ver más opciones de la aplicación" showBack />
+      <AppHeader title="Más" showBack />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
         {/* Noticias */}
@@ -30,7 +30,6 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Noticias</Text>
-            <Text style={styles.cardSub}>Las noticias más importantes del día</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -46,7 +45,6 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Clima</Text>
-            <Text style={styles.cardSub}>Consultá el clima del día</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -58,7 +56,6 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Radio</Text>
-            <Text style={styles.cardSub}>Escuchá la radio</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -74,7 +71,6 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Juegos</Text>
-            <Text style={styles.cardSub}>Divertite con ElderTech</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -89,8 +85,7 @@ export default function MasScreen() {
             <Text style={styles.icon}>🔦</Text>
           </View>
           <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>Utilidades</Text>
-            <Text style={styles.cardSub}>Linterna</Text>
+            <Text style={styles.cardTitle}>Linterna</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
@@ -112,19 +107,20 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: Colors.white, borderRadius: Radius.lg,
-    padding: Spacing.lg, shadowColor: Colors.shadow,
+    padding: Spacing.xl, shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1,
     shadowRadius: 4, elevation: 2,
+    minHeight: 90,
   },
   iconBox: {
-    width: 56, height: 56, borderRadius: 28,
-    alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
+    width: 72, height: 72, borderRadius: 36,
+    alignItems: 'center', justifyContent: 'center', marginRight: Spacing.lg,
   },
-  icon: { fontSize: 28 },
+  icon: { fontSize: 38 },
   cardInfo: { flex: 1 },
-  cardTitle: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary },
+  cardTitle: { fontSize: 30, fontWeight: 'bold', color: Colors.textPrimary },
   cardSub: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 2 },
-  arrow: { fontSize: 28, color: Colors.textLight, fontWeight: 'bold' },
+  arrow: { fontSize: 36, color: Colors.textLight, fontWeight: 'bold' },
   backBtn: {
     backgroundColor: Colors.primaryDark, borderRadius: Radius.sm,
     paddingVertical: Spacing.md, alignItems: 'center', marginTop: Spacing.lg,

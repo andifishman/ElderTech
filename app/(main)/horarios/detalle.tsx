@@ -1,5 +1,5 @@
 import AppHeader from '@/components/ui/AppHeader';
-import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -48,11 +48,11 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1, shadowRadius: 4, elevation: 2,
   },
-  icon: { fontSize: 60, marginBottom: Spacing.md },
-  title: { fontSize: FontSizes.xxl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.xs },
-  time: { fontSize: FontSizes.md, color: Colors.textSecondary, marginBottom: Spacing.xl },
+  icon: { fontSize: 80, marginBottom: Spacing.md },
+  title: { fontSize: 48, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.xs, textAlign: 'center' },
+  time: { fontSize: 26, color: Colors.textSecondary, marginBottom: Spacing.xl },
   section: { width: '100%', marginBottom: Spacing.lg },
-  sectionTitle: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.primary, marginBottom: Spacing.xs },
-  sectionText: { fontSize: FontSizes.md, color: Colors.textPrimary, lineHeight: 22 },
-  sectionSubText: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 4 },
+  sectionTitle: { fontSize: 24, fontWeight: 'bold', color: Colors.primary, marginBottom: Spacing.xs },
+  sectionText: { fontSize: 22, color: Colors.textPrimary, lineHeight: 32 },
+  sectionSubText: { fontSize: 18, color: Colors.textSecondary, marginTop: 4 },
 });

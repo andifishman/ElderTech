@@ -8,16 +8,16 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
-  Alert,
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text, TextInput, TouchableOpacity,
-  View
+    Alert,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text, TextInput, TouchableOpacity,
+    View
 } from 'react-native';
 
-const RELATIONS = ['Hijo/a', 'Nieto/a', 'Médico', 'Amigo', 'Otra...'];
+const COMMON_COUNTRY_CODES_LIST = COMMON_COUNTRY_CODES;
 
 export default function AgregarContactoScreen() {
   const router = useRouter();
@@ -25,11 +25,8 @@ export default function AgregarContactoScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+54');
-  const [relation, setRelation] = useState('');
-  const [customRelation, setCustomRelation] = useState('');
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [showCustomRelation, setShowCustomRelation] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const [suggestions, setSuggestions] = useState<Contacts.Contact[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -156,31 +153,14 @@ export default function AgregarContactoScreen() {
 
   const filteredPhoneContacts = useMemo(() => [], []);
 
-  const handleRelationSelect = (r: string) => {
-    if (r === 'Otra...') {
-      setShowCustomRelation(true);
-      setRelation('');
-    } else {
-      setRelation(r);
-      setShowCustomRelation(false);
-    }
-  };
+  const handleRelationSelect = (_r: string) => {};
 
   const handleSave = () => {
     if (!name || !phone) {
       Alert.alert('Error', 'Nombre y teléfono son obligatorios');
       return;
     }
-    
-    const finalRelation = showCustomRelation ? customRelation : relation;
-    const contactData = {
-      name,
-      phone: `${countryCode} ${phone}`,
-      avatar,
-      ...(finalRelation && { relation: finalRelation }),
-    };
-    
-    addContact(contactData);
+    addContact({ name, phone: `${countryCode} ${phone}`, avatar });
     router.back();
   };
 
@@ -242,28 +222,6 @@ export default function AgregarContactoScreen() {
             keyboardType="phone-pad"
           />
         </View>
-
-        <Text style={styles.label}>Relación (opcional)</Text>
-        <View style={styles.relationsRow}>
-          {RELATIONS.map((r) => (
-            <TouchableOpacity
-              key={r}
-              style={[styles.relBtn, relation === r && styles.relBtnActive]}
-              onPress={() => handleRelationSelect(r)}
-            >
-              <Text style={[styles.relBtnText, relation === r && styles.relBtnTextActive]}>{r}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {showCustomRelation && (
-          <TextInput
-            style={[styles.input, styles.customRelationInput]}
-            placeholder="Escribe la relación..."
-            value={customRelation}
-            onChangeText={setCustomRelation}
-          />
-        )}
 
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveBtnText}>✓ Guardar contacto</Text>

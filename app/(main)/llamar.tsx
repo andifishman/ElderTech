@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import {
     Alert,
     Linking,
-    Modal,
     ScrollView,
     StyleSheet,
     Text,
@@ -20,20 +19,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function LlamarScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { contacts, deleteContact } = useContacts();
+  const { contacts } = useContacts();
   const [search, setSearch] = useState('');
-  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filtered = contacts.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  const confirmDelete = () => {
-    if (deleteId) {
-      deleteContact(deleteId);
-      setDeleteId(null);
-    }
-  };
 
   const handleCall = (phone: string) => {
     const url = `tel:${phone.replace(/\s/g, '')}`;
@@ -95,21 +86,10 @@ export default function LlamarScreen() {
               </View>
               <View style={styles.contactInfo}>
                 <Text style={styles.contactName}>{contact.name}</Text>
-                <Text style={styles.contactPhone}>{contact.phone}</Text>
-                {contact.relation && (
-                  <Text style={styles.contactRelation}>👤 {contact.relation}</Text>
-                )}
               </View>
             </View>
             {/* Botones en fila */}
             <View style={styles.contactActions}>
-              <TouchableOpacity
-                style={[styles.actionBtn, styles.actionBtnEdit]}
-                onPress={() => router.push({ pathname: '/(main)/llamar/editar', params: { id: contact.id } } as any)}
-              >
-                <Text style={styles.actionBtnIcon}>✏️</Text>
-                <Text style={styles.actionBtnText}>Editar</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.actionBtn, styles.actionBtnCall]}
                 onPress={() => handleCall(contact.phone)}
@@ -124,36 +104,12 @@ export default function LlamarScreen() {
                 <Text style={styles.actionBtnIcon}>💬</Text>
                 <Text style={styles.actionBtnText}>WhatsApp</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionBtn, styles.actionBtnDelete]}
-                onPress={() => setDeleteId(contact.id)}
-              >
-                <Text style={styles.actionBtnIcon}>🗑️</Text>
-                <Text style={styles.actionBtnText}>Borrar</Text>
-              </TouchableOpacity>
             </View>
           </View>
         ))}
       </ScrollView>
 
-      {/* Delete confirmation modal */}
-      <Modal visible={!!deleteId} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalIcon}>🗑️</Text>
-            <Text style={styles.modalTitle}>Eliminar Contacto</Text>
-            <Text style={styles.modalSub}>¿Estás seguro que querés eliminar el contacto?</Text>
-            <View style={styles.modalBtns}>
-              <TouchableOpacity style={styles.modalBtnDanger} onPress={confirmDelete}>
-                <Text style={styles.modalBtnDangerText}>Eliminar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setDeleteId(null)}>
-                <Text style={styles.modalBtnCancelText}>Volver</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Delete confirmation modal removed */}
     </View>
   );
 }
@@ -173,7 +129,7 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, paddingVertical: Spacing.md, fontSize: FontSizes.md },
   searchIcon: { fontSize: 18 },
-  sectionTitle: { fontSize: FontSizes.lg, fontWeight: 'bold', color: Colors.textPrimary },
+  sectionTitle: { fontSize: 28, fontWeight: 'bold', color: Colors.textPrimary },
   contactCard: {
     backgroundColor: Colors.white, borderRadius: Radius.md,
     padding: Spacing.md,
@@ -193,9 +149,7 @@ const styles = StyleSheet.create({
   avatarImage: { width: 52, height: 52, borderRadius: 26 },
   avatarText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.xl },
   contactInfo: { flex: 1 },
-  contactName: { fontSize: FontSizes.lg, fontWeight: 'bold', color: Colors.textPrimary },
-  contactPhone: { fontSize: FontSizes.md, color: Colors.textSecondary, marginTop: 2 },
-  contactRelation: { fontSize: FontSizes.sm, color: Colors.primary, fontWeight: '600', marginTop: 2 },
+  contactName: { fontSize: 36, fontWeight: 'bold', color: Colors.textPrimary },
   contactActions: {
     flexDirection: 'row', gap: Spacing.xs,
   },

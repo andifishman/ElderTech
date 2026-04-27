@@ -52,14 +52,6 @@ const games = [
     iconBg: Colors.orange,
   },
   {
-    id: 'sudoku',
-    icon: '🔢',
-    title: 'Sudoku',
-    subtitle: 'Completá el tablero del 1 al 9',
-    color: Colors.purpleLight,
-    iconBg: Colors.purple,
-  },
-  {
     id: 'laberinto',
     icon: '🌀',
     title: 'Laberinto',
@@ -74,13 +66,13 @@ export default function JuegosScreen() {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
-      <AppHeader title="Juegos" subtitle="Divertite con ElderTech" showBack />
+      <AppHeader title="Juegos" showBack />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.heading}>Elegí un juego</Text>
         {games.map((game) => (
           <TouchableOpacity
             key={game.id}
-            style={[styles.card, { backgroundColor: game.color }]}
+            style={[styles.card, { backgroundColor: Colors.white }]}
             onPress={() => {
               if (game.id === 'memotest') {
                 router.push('/(main)/juegos/memotest' as any);
@@ -92,8 +84,6 @@ export default function JuegosScreen() {
                 router.push('/(main)/juegos/conexiones' as any);
               } else if (game.id === 'sopa') {
                 router.push('/(main)/juegos/sopa' as any);
-              } else if (game.id === 'sudoku') {
-                router.push('/(main)/juegos/sudoku' as any);
               } else if (game.id === 'laberinto') {
                 router.push('/(main)/juegos/laberinto' as any);
               }
@@ -105,7 +95,6 @@ export default function JuegosScreen() {
             </View>
             <View style={styles.cardInfo}>
               <Text style={styles.cardTitle}>{game.title}</Text>
-              <Text style={styles.cardSub}>{game.subtitle}</Text>
             </View>
             <Text style={styles.arrow}>›</Text>
           </TouchableOpacity>
@@ -118,20 +107,21 @@ export default function JuegosScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   content: { padding: Spacing.lg, gap: Spacing.md },
-  heading: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.sm },
+  heading: { fontSize: 28, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.sm },
   card: {
     flexDirection: 'row', alignItems: 'center',
-    borderRadius: Radius.lg, padding: Spacing.lg,
+    borderRadius: Radius.lg, padding: Spacing.xl,
     shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1, shadowRadius: 4, elevation: 2,
+    minHeight: 90,
   },
   iconBox: {
-    width: 52, height: 52, borderRadius: 26,
-    alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
+    width: 72, height: 72, borderRadius: 36,
+    alignItems: 'center', justifyContent: 'center', marginRight: Spacing.lg,
   },
-  icon: { fontSize: 26 },
+  icon: { fontSize: 38 },
   cardInfo: { flex: 1 },
-  cardTitle: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary },
+  cardTitle: { fontSize: 30, fontWeight: 'bold', color: Colors.textPrimary },
   cardSub: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 2 },
-  arrow: { fontSize: 28, color: Colors.textLight, fontWeight: 'bold' },
+  arrow: { fontSize: 36, color: Colors.textLight, fontWeight: 'bold' },
 });

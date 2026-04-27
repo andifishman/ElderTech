@@ -307,24 +307,24 @@ const styles = StyleSheet.create({
   bubble: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.sm },
   botBubble: { justifyContent: 'flex-start' },
   userBubble: { justifyContent: 'flex-end' },
-  botIcon: { fontSize: 24, marginBottom: 4 },
+  botIcon: { fontSize: 30, marginBottom: 4 },
   bubbleContent: { maxWidth: '80%', borderRadius: Radius.md, padding: Spacing.md },
   botContent: { backgroundColor: Colors.white, borderBottomLeftRadius: 4 },
   userContent: { backgroundColor: Colors.primary, borderBottomRightRadius: 4 },
-  bubbleText: { fontSize: FontSizes.md, lineHeight: 24 },
+  bubbleText: { fontSize: 22, lineHeight: 32 },
   botText: { color: Colors.textPrimary },
   userText: { color: Colors.white },
 
   faqSection: { marginTop: Spacing.lg },
-  faqTitle: { fontSize: FontSizes.md, fontWeight: 'bold', color: Colors.textSecondary, marginBottom: Spacing.sm },
+  faqTitle: { fontSize: 20, fontWeight: 'bold', color: Colors.textSecondary, marginBottom: Spacing.sm },
   faqBtn: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     backgroundColor: Colors.white, borderRadius: Radius.sm,
     padding: Spacing.md, marginBottom: Spacing.sm,
     borderWidth: 1, borderColor: Colors.border,
   },
-  faqIcon: { fontSize: 16 },
-  faqText: { flex: 1, fontSize: FontSizes.sm, color: Colors.textPrimary },
+  faqIcon: { fontSize: 22 },
+  faqText: { flex: 1, fontSize: 20, color: Colors.textPrimary },
 
   inputRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: Colors.inputBg,
     borderWidth: 1, borderColor: Colors.inputBorder,
     borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
-    fontSize: FontSizes.md, maxHeight: 80,
+    fontSize: 20, maxHeight: 100,
   },
   micBtn: {
     width: 44, height: 44, borderRadius: 22,

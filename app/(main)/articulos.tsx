@@ -47,7 +47,7 @@ export default function ArticulosScreen() {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Artículos" subtitle="Aprendé a usar la tecnología" showBack />
+      <AppHeader title="Tutoriales" subtitle="Aprendé a usar la tecnología" showBack />
 
       {/* Category tabs */}
       <View style={styles.tabs}>
