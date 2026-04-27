@@ -29,7 +29,7 @@ const menuItems = [
   { 
     id: 'articulos', icon: '📚', label: 'Tutoriales', 
     subtitle: 'Aprendé con videos', color: '#F0E5FF', iconBg: '#CC99FF', size: 'medium',
-    audio: 'Artículos. Encontrás guías y videos para aprender a usar el celular paso a paso.',
+    audio: 'Tutoriales. Encontrás guías y videos para aprender a usar el celular paso a paso.',
   },
   { 
     id: 'asistente', icon: '🤖', label: 'Asistente', 
