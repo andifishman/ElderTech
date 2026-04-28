@@ -3,7 +3,6 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     FlatList,
     Modal,
     ScrollView,
@@ -185,6 +184,9 @@ export default function ClimaScreen() {
   const [searchResults, setSearchResults] = useState<CityResult[]>([]);
   const [searching, setSearching] = useState(false);
 
+  // Delete confirm modal
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+
   const loadWeather = useCallback(async (city: SavedCity) => {
     setLoading(true);
     setError(null);
@@ -241,22 +243,16 @@ export default function ClimaScreen() {
   };
 
   const removeCity = (index: number) => {
-    if (index === 0) {
-      Alert.alert('No se puede eliminar', 'Buenos Aires es la ciudad principal.');
-      return;
-    }
-    Alert.alert('Eliminar ciudad', `¿Querés eliminar ${cities[index].name}?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Eliminar',
-        style: 'destructive',
-        onPress: () => {
-          const newCities = cities.filter((_, i) => i !== index);
-          setCities(newCities);
-          setSelectedIndex(0);
-        },
-      },
-    ]);
+    if (index === 0) return; // Buenos Aires no se puede eliminar
+    setDeleteIndex(index);
+  };
+
+  const confirmDelete = () => {
+    if (deleteIndex === null) return;
+    const newCities = cities.filter((_, i) => i !== deleteIndex);
+    setCities(newCities);
+    setSelectedIndex(0);
+    setDeleteIndex(null);
   };
 
   const bgColor = weather
@@ -377,6 +373,33 @@ export default function ClimaScreen() {
           </>
         ) : null}
       </ScrollView>
+
+      {/* Delete confirm modal */}
+      <Modal visible={deleteIndex !== null} transparent animationType="fade">
+        <View style={styles.deleteModalOverlay}>
+          <View style={styles.deleteModalBox}>
+            <Text style={styles.deleteModalIcon}>🗑️</Text>
+            <Text style={styles.deleteModalTitle}>Eliminar ciudad</Text>
+            <Text style={styles.deleteModalSub}>
+              ¿Querés eliminar {deleteIndex !== null ? cities[deleteIndex]?.name : ''}?
+            </Text>
+            <View style={styles.deleteModalBtns}>
+              <TouchableOpacity
+                style={styles.deleteModalBtnCancel}
+                onPress={() => setDeleteIndex(null)}
+              >
+                <Text style={styles.deleteModalBtnCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteModalBtnConfirm}
+                onPress={confirmDelete}
+              >
+                <Text style={styles.deleteModalBtnConfirmText}>Eliminar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Add city modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
@@ -597,4 +620,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelText: { color: Colors.textSecondary, fontSize: FontSizes.lg, fontWeight: '600' },
+
+  // Delete confirm modal
+  deleteModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteModalBox: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.xl,
+    padding: Spacing.xxl,
+    width: '85%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  deleteModalIcon: { fontSize: 52, marginBottom: Spacing.md },
+  deleteModalTitle: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.textPrimary, marginBottom: Spacing.sm },
+  deleteModalSub: { fontSize: FontSizes.md, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.xl },
+  deleteModalBtns: { flexDirection: 'row', gap: Spacing.md, width: '100%' },
+  deleteModalBtnCancel: {
+    flex: 1, backgroundColor: Colors.background, borderRadius: Radius.md,
+    paddingVertical: Spacing.md, alignItems: 'center',
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  deleteModalBtnCancelText: { color: Colors.textSecondary, fontWeight: 'bold', fontSize: FontSizes.md },
+  deleteModalBtnConfirm: {
+    flex: 1, backgroundColor: Colors.danger, borderRadius: Radius.md,
+    paddingVertical: Spacing.md, alignItems: 'center',
+  },
+  deleteModalBtnConfirmText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.md },
 });

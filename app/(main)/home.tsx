@@ -251,14 +251,14 @@ const styles = StyleSheet.create({
   // Welcome Section
   welcomeSection: {
     paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 8,
   },
   welcome: { 
     color: '#2E3A59', 
-    fontSize: 32, 
+    fontSize: 22, 
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   welcomeSub: { 
     color: '#8A8A8A', 
@@ -266,21 +266,21 @@ const styles = StyleSheet.create({
   },
   // Grid Layout
   grid: { 
-    padding: 20,
-    paddingTop: 6,
+    padding: 16,
+    paddingTop: 4,
   },
 
   // Large Card (Horarios)
   largeCard: {
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 14,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-    minHeight: 200,
+    minHeight: 175,
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
@@ -291,31 +291,31 @@ const styles = StyleSheet.create({
   largeCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    paddingBottom: 10,
+    padding: 16,
+    paddingBottom: 8,
   },
   largeIconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 20,
+    marginRight: 16,
   },
   largeCardIcon: { 
-    fontSize: 36 
+    fontSize: 32
   },
   largeCardText: { 
     flex: 1 
   },
   largeCardLabel: { 
-    fontSize: 32, 
+    fontSize: 28, 
     fontWeight: 'bold', 
     color: '#FFFFFF',
     marginBottom: 4,
   },
   largeCardSub: { 
-    fontSize: 18, 
+    fontSize: 16, 
     color: 'rgba(255,255,255,0.85)',
   },
   largeCardBottom: {
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   mediumRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    marginBottom: 12,
   },
   mediumCard: {
     width: '48%',
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-    minHeight: 260,
+    minHeight: 230,
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
@@ -376,35 +376,35 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   mediumCardInner: {
-    padding: 16,
-    paddingBottom: 8,
+    padding: 14,
+    paddingBottom: 6,
     flex: 1,
   },
   mediumCardContent: {
     flex: 1,
   },
   mediumCardLabel: { 
-    fontSize: 26, 
+    fontSize: 22, 
     fontWeight: 'bold', 
     color: '#FFFFFF',
-    marginBottom: 6,
-    marginTop: 8,
+    marginBottom: 4,
+    marginTop: 6,
   },
   mediumCardSub: { 
-    fontSize: 15, 
+    fontSize: 14, 
     color: 'rgba(255,255,255,0.85)',
-    lineHeight: 20,
+    lineHeight: 19,
   },
   mediumIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   mediumCardIcon: { 
-    fontSize: 26,
+    fontSize: 24,
   },
   mediumCardBottom: {
     padding: 12,

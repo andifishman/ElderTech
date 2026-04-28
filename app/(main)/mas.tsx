@@ -3,10 +3,10 @@ import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text, TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -30,6 +30,37 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Juegos</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
+        {/* Biblioteca */}
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/biblioteca' as any)}
+        >
+          <View style={[styles.iconBox, { backgroundColor: '#FFF8E1' }]}>
+            <Text style={styles.icon}>📚</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>Biblioteca</Text>
+            <Text style={styles.cardSub}>Libros y cuentos para leer</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
+        {/* Música Judía */}
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/musica-judia' as any)}
+        >
+          <View style={[styles.iconBox, { backgroundColor: '#E8EAF6' }]}>
+            <Text style={styles.icon}>✡️</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>Música Judía</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
