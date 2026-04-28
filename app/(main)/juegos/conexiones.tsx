@@ -2,13 +2,13 @@ import AppHeader from '@/components/ui/AppHeader';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -54,6 +54,10 @@ const ALL_GROUPS: { category: string; color: string; items: string[] }[] = [
   { category: 'Estaciones del año', color: '#F57F17', items: ['Primavera','Verano','Otoño','Invierno'] },
   { category: 'Signos del zodiaco', color: '#6A1B9A', items: ['Aries','Tauro','Geminis','Cancer','Leo','Virgo','Libra','Escorpio','Sagitario','Capricornio','Acuario','Piscis'] },
   { category: 'Cosas de la escuela', color: '#0288D1', items: ['Lapiz','Goma','Regla','Cuaderno','Mochila','Tijera','Pegamento','Compas','Marcador','Carpeta'] },
+  { category: 'Fiestas judías',      color: '#1565C0', items: ['Pesaj','Janucá','Purim','Rosh Hashaná','Yom Kipur','Sucot','Shavuot','Lag Baomer','Simjat Torá','Tu Bishvat','Tisha Beav','Shabbat'] },
+  { category: 'Objetos judíos',      color: '#4527A0', items: ['Menorá','Mezuzá','Kipá','Talít','Shofar','Sidur','Torá','Janukiá','Etrog','Lulav','Matzá','Havdalá'] },
+  { category: 'Comidas judías',      color: '#6A1B9A', items: ['Jalá','Matzá','Latke','Kugel','Cholent','Rugelaj','Hamantash','Sufganiyá','Borekas','Gefilte fish'] },
+  { category: 'Palabras en hebreo',  color: '#283593', items: ['Shalom','Mazel tov','Lehayim','Toda','Sababa','Yalla','Achi','Davka','Stam','Beseder','Chaver','Neshama'] },
 ];
 
 function shuffle<T>(arr: T[]): T[] {

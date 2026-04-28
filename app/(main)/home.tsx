@@ -18,27 +18,27 @@ const { width } = Dimensions.get('window');
 const menuItems = [
   { 
     id: 'horarios', icon: '📅', label: 'Horarios', 
-    subtitle: 'Actividades de la semana', color: '#FFE5E5', iconBg: '#FF9999', size: 'large',
+    subtitle: 'Actividades de la semana', color: '#E57373', iconBg: '#EF9A9A', size: 'large',
     audio: 'Horarios. Acá podés ver todas las actividades de la semana, con sus horarios y descripciones.',
   },
   { 
     id: 'llamar', icon: '📞', label: 'Llamar', 
-    subtitle: 'Contactar a personas', color: '#E5F9E5', iconBg: '#99E699', size: 'medium',
+    subtitle: 'Contactar a personas', color: '#66BB6A', iconBg: '#A5D6A7', size: 'medium',
     audio: 'Llamar. Desde acá podés llamar o escribirle por WhatsApp a tu familia y amigos.',
   },
   { 
     id: 'articulos', icon: '📚', label: 'Tutoriales', 
-    subtitle: 'Aprendé con videos', color: '#F0E5FF', iconBg: '#CC99FF', size: 'medium',
+    subtitle: 'Aprendé con videos', color: '#AB47BC', iconBg: '#CE93D8', size: 'medium',
     audio: 'Tutoriales. Encontrás guías y videos para aprender a usar el celular paso a paso.',
   },
   { 
     id: 'asistente', icon: '🤖', label: 'Asistente', 
-    subtitle: 'Asistente personal para ayudas', color: '#E5F5FF', iconBg: '#99CCFF', size: 'medium',
+    subtitle: 'Asistente personal para ayudas', color: '#42A5F5', iconBg: '#90CAF9', size: 'medium',
     audio: 'Asistente. Podés hacerle preguntas y te va a responder de forma simple y clara.',
   },
   { 
     id: 'mas', icon: '➕', label: 'Más', 
-    subtitle: 'Ver más opciones de la aplicación', color: '#FFF0E5', iconBg: '#FFCC99', size: 'medium',
+    subtitle: 'Ver más opciones de la aplicación', color: '#FFA726', iconBg: '#FFCC80', size: 'medium',
     audio: 'Más opciones. Acá encontrás juegos, radio, noticias, clima, linterna y más.',
   },
 ];
@@ -214,8 +214,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 6,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+  
   },
   headerRow: {
     flexDirection: 'row', 
@@ -312,12 +311,12 @@ const styles = StyleSheet.create({
   largeCardLabel: { 
     fontSize: 32, 
     fontWeight: 'bold', 
-    color: '#2E3A59',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   largeCardSub: { 
     fontSize: 18, 
-    color: '#666',
+    color: 'rgba(255,255,255,0.85)',
   },
   largeCardBottom: {
     padding: 12,
@@ -334,7 +333,7 @@ const styles = StyleSheet.create({
   audioBtnText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#2E3A59',
+    color: '#FFFFFF',
   },
   // Botones inferiores legacy (por si quedan referencias)
   smallIconCircle: {
@@ -387,13 +386,13 @@ const styles = StyleSheet.create({
   mediumCardLabel: { 
     fontSize: 26, 
     fontWeight: 'bold', 
-    color: '#2E3A59',
+    color: '#FFFFFF',
     marginBottom: 6,
     marginTop: 8,
   },
   mediumCardSub: { 
     fontSize: 15, 
-    color: '#666',
+    color: 'rgba(255,255,255,0.85)',
     lineHeight: 20,
   },
   mediumIconCircle: {

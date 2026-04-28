@@ -19,6 +19,21 @@ export default function MasScreen() {
       <AppHeader title="Más" showBack />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} showsVerticalScrollIndicator={false}>
 
+        {/* Juegos */}
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(main)/juegos' as any)}
+        >
+          <View style={[styles.iconBox, { backgroundColor: Colors.purpleLight }]}>
+            <Text style={styles.icon}>🎲</Text>
+          </View>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>Juegos</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
         {/* Noticias */}
         <TouchableOpacity
           style={styles.card}
@@ -56,21 +71,6 @@ export default function MasScreen() {
           </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>Radio</Text>
-          </View>
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Juegos */}
-        <TouchableOpacity
-          style={styles.card}
-          activeOpacity={0.8}
-          onPress={() => router.push('/(main)/juegos' as any)}
-        >
-          <View style={[styles.iconBox, { backgroundColor: Colors.purpleLight }]}>
-            <Text style={styles.icon}>🎲</Text>
-          </View>
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>Juegos</Text>
           </View>
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>

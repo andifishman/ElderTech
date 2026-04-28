@@ -1,31 +1,35 @@
 import AppHeader from '@/components/ui/AppHeader';
 import { Colors, FontSizes, Radius, Spacing } from '@/constants/theme';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View,
+    FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Temas ────────────────────────────────────────────────────────────────────
 const TEMAS = [
-  { nombre: 'Frutas',       palabras: ['MANZANA','PERA','UVA','LIMON','MELON','SANDIA','NARANJA','DURAZNO','BANANA','CIRUELA','FRUTILLA','KIWI','MANGO','CEREZA'] },
-  { nombre: 'Verduras',     palabras: ['PAPA','TOMATE','CEBOLLA','ZANAHORIA','LECHUGA','ZAPALLO','ACELGA','ESPINACA','BROCOLI','PEPINO','APIO','CHOCLO','BERENJENA','AJO'] },
-  { nombre: 'Animales',     palabras: ['PERRO','GATO','LEON','TIGRE','OSO','LOBO','VACA','CABALLO','CONEJO','MONO','ELEFANTE','JIRAFA','DELFIN','TORTUGA'] },
-  { nombre: 'Colores',      palabras: ['ROJO','AZUL','VERDE','ROSA','NEGRO','BLANCO','GRIS','CELESTE','AMARILLO','NARANJA','VIOLETA','MARRON'] },
-  { nombre: 'Paises',       palabras: ['ARGENTINA','BRASIL','CHILE','PERU','MEXICO','FRANCIA','ITALIA','JAPON','ESPANA','CHINA','ALEMANIA','CANADA'] },
-  { nombre: 'Deportes',     palabras: ['FUTBOL','TENIS','GOLF','BOXEO','RUGBY','POLO','REMO','JUDO','NATACION','CICLISMO','VOLEY','BASQUET'] },
-  { nombre: 'Flores',       palabras: ['ROSA','CLAVEL','TULIPAN','GIRASOL','JAZMIN','MARGARITA','LILA','DALIA','AMAPOLA','BEGONIA','LAVANDA','ORQUIDEA'] },
-  { nombre: 'Comidas',      palabras: ['PIZZA','MILANESA','EMPANADA','ASADO','FIDEOS','ARROZ','SOPA','ENSALADA','TARTA','LOCRO','CHORIPAN','ALFAJOR'] },
-  { nombre: 'Ropa',         palabras: ['CAMISA','PANTALON','VESTIDO','ABRIGO','BUFANDA','GORRO','ZAPATOS','MEDIAS','REMERA','CAMPERA','CORBATA','GUANTES'] },
-  { nombre: 'Muebles',      palabras: ['SILLA','MESA','CAMA','SOFA','ARMARIO','ESCRITORIO','ESTANTE','SILLON','COMODA','ROPERO'] },
-  { nombre: 'Transportes',  palabras: ['AUTO','TREN','AVION','BARCO','BICICLETA','MOTO','COLECTIVO','SUBTE','CAMION','TAXI','LANCHA','TRANVIA'] },
-  { nombre: 'Profesiones',  palabras: ['MEDICO','MAESTRO','ABOGADO','COCINERO','BOMBERO','POLICIA','ENFERMERO','PILOTO','CARPINTERO','CONTADOR','VETERINARIO'] },
-  { nombre: 'Instrumentos', palabras: ['GUITARRA','PIANO','VIOLIN','FLAUTA','BATERIA','TROMPETA','ARPA','ACORDEON','BAJO','BOMBO','SAXOFON','CLARINETE'] },
-  { nombre: 'Partes del cuerpo', palabras: ['CABEZA','BRAZO','PIERNA','MANO','PIE','ESPALDA','CUELLO','RODILLA','CODO','HOMBRO','TOBILLO','PECHO'] },
-  { nombre: 'Meses',        palabras: ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','OCTUBRE','NOVIEMBRE','DICIEMBRE'] },
+  { nombre: 'Frutas',       palabras: ['MANZANA','PERA','UVA','LIMON','MELON','SANDIA','NARANJA','DURAZNO','BANANA','CIRUELA','FRUTILLA','KIWI','MANGO','CEREZA','POMELO','MANDARINA','HIGO','FRAMBUESA','PAPAYA','COCO','ANANA','GUAYABA','MARACUYA','DAMASCO','MEMBRILLO'] },
+  { nombre: 'Verduras',     palabras: ['PAPA','TOMATE','CEBOLLA','ZANAHORIA','LECHUGA','ZAPALLO','ACELGA','ESPINACA','BROCOLI','PEPINO','APIO','CHOCLO','BERENJENA','AJO','PUERRO','NABO','RABANITO','ALCAUCIL','COLIFLOR','REMOLACHA','ARVEJA','CHAUCHA','HINOJO','BATATA','MORRÓN'] },
+  { nombre: 'Animales',     palabras: ['PERRO','GATO','LEON','TIGRE','OSO','LOBO','VACA','CABALLO','CONEJO','MONO','ELEFANTE','JIRAFA','DELFIN','TORTUGA','AGUILA','COCODRILO','CEBRA','HIPOPOTAMO','RINOCERONTE','PINGUINO','FLAMENCO','CAMELLO','CANGURO','KOALA','PANDA','BALLENA','TIBURON','PULPO','MEDUSA','CANGREJO'] },
+  { nombre: 'Colores',      palabras: ['ROJO','AZUL','VERDE','ROSA','NEGRO','BLANCO','GRIS','CELESTE','AMARILLO','NARANJA','VIOLETA','MARRON','TURQUESA','MAGENTA','BEIGE','DORADO','PLATEADO','INDIGO','CORAL','SALMON','OCRE','CIAN','LILA','BORDO','OLIVA'] },
+  { nombre: 'Paises',       palabras: ['ARGENTINA','BRASIL','CHILE','PERU','MEXICO','FRANCIA','ITALIA','JAPON','ESPANA','CHINA','ALEMANIA','CANADA','AUSTRALIA','RUSIA','INDIA','EGIPTO','GRECIA','PORTUGAL','COLOMBIA','CUBA','TURQUIA','SUECIA','NORUEGA','HOLANDA','BELGICA'] },
+  { nombre: 'Deportes',     palabras: ['FUTBOL','TENIS','GOLF','BOXEO','RUGBY','POLO','REMO','JUDO','NATACION','CICLISMO','VOLEY','BASQUET','ATLETISMO','ESGRIMA','KARATE','HOCKEY','BEISBOL','SOFTBOL','ESQUI','SURF','ESCALADA','PATINAJE','HANDBALL','WATERPOLO','TAEKWONDO'] },
+  { nombre: 'Flores',       palabras: ['ROSA','CLAVEL','TULIPAN','GIRASOL','JAZMIN','MARGARITA','LILA','DALIA','AMAPOLA','BEGONIA','LAVANDA','ORQUIDEA','AZALEA','CAMELIA','GARDENIA','PETUNIA','VIOLETA','MAGNOLIA','CRISANTEMO','NARCISO','GLADIOLO','HORTENSIA','LIRIO','GERANIO','NARDO'] },
+  { nombre: 'Comidas',      palabras: ['PIZZA','MILANESA','EMPANADA','ASADO','FIDEOS','ARROZ','SOPA','ENSALADA','TARTA','LOCRO','CHORIPAN','ALFAJOR','HUMITA','CARBONADA','CAZUELA','GUISO','ESTOFADO','REVUELTO','TORTILLA','CROQUETA','CANELONES','LASAGNA','RISOTTO','PAELLA','CEVICHE'] },
+  { nombre: 'Ropa',         palabras: ['CAMISA','PANTALON','VESTIDO','ABRIGO','BUFANDA','GORRO','ZAPATOS','MEDIAS','REMERA','CAMPERA','CORBATA','GUANTES','POLLERA','BERMUDA','CALZADO','BOTAS','SANDALIAS','CHALECO','PIJAMA','BATA','DELANTAL','OVEROL','BIKINI','TRAJE','CAMISETA'] },
+  { nombre: 'Muebles',      palabras: ['SILLA','MESA','CAMA','SOFA','ARMARIO','ESCRITORIO','ESTANTE','SILLON','COMODA','ROPERO','BANQUETA','VITRINA','APARADOR','CAJONERA','PERCHERO','BIBLIOTECA','PUPITRE','MECEDORA','HAMACA','OTOMANA','BAULERA','CHIFONIER','TRINCHANTE','BARGÜENO','VELADOR'] },
+  { nombre: 'Transportes',  palabras: ['AUTO','TREN','AVION','BARCO','BICICLETA','MOTO','COLECTIVO','SUBTE','CAMION','TAXI','LANCHA','TRANVIA','HELICOPTERO','VELERO','KAYAK','PATINETA','MONOPATÍN','TROLEBÚS','FUNICULAR','TELEFÉRICO','CRUCERO','SUBMARINO','GLOBO','TRINEO','CARRETA'] },
+  { nombre: 'Profesiones',  palabras: ['MEDICO','MAESTRO','ABOGADO','COCINERO','BOMBERO','POLICIA','ENFERMERO','PILOTO','CARPINTERO','CONTADOR','VETERINARIO','ARQUITECTO','INGENIERO','PERIODISTA','FOTOGRAFO','MUSICO','PINTOR','ESCULTOR','ASTRONAUTA','GEOLOGO','BIOLOGO','QUIMICO','FILOSOFO','SOCIOLOGO','PSICOLOGO'] },
+  { nombre: 'Instrumentos', palabras: ['GUITARRA','PIANO','VIOLIN','FLAUTA','BATERIA','TROMPETA','ARPA','ACORDEON','BAJO','BOMBO','SAXOFON','CLARINETE','OBOE','FAGOT','CELLO','VIOLA','MANDOLINA','BANDONEON','CHARANGO','QUENA','SIKU','MARIMBA','XILOFON','TIMBAL','PANDERETA'] },
+  { nombre: 'Partes del cuerpo', palabras: ['CABEZA','BRAZO','PIERNA','MANO','PIE','ESPALDA','CUELLO','RODILLA','CODO','HOMBRO','TOBILLO','PECHO','FRENTE','MEJILLA','MENTON','NARIZ','OREJA','CEJA','PESTANA','LABIO','MUNECA','PULGAR','TALÓN','PANTORRILLA','CADERA'] },
+  { nombre: 'Meses',        palabras: ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'] },
   { nombre: 'Dias',         palabras: ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO','DOMINGO'] },
-  { nombre: 'Bebidas',      palabras: ['AGUA','JUGO','LECHE','CAFE','TE','MATE','GASEOSA','LIMONADA','CHOCOLATE','CERVEZA'] },
-  { nombre: 'Postres',      palabras: ['HELADO','TORTA','FLAN','BROWNIE','MOUSSE','BUDIN','PANQUEQUE','ALFAJOR','CHURROS','FACTURAS'] },
+  { nombre: 'Bebidas',      palabras: ['AGUA','JUGO','LECHE','CAFE','TE','MATE','GASEOSA','LIMONADA','CHOCOLATE','CERVEZA','VINO','SIDRA','CHAMPAN','TERERÉ','SUBMARINO','LICUADO','SMOOTHIE','KOMBUCHA','KEFIR','CALDO','INFUSION','REFRESCO','SODA','TÓNICA','APERITIVO'] },
+  { nombre: 'Postres',      palabras: ['HELADO','TORTA','FLAN','BROWNIE','MOUSSE','BUDIN','PANQUEQUE','ALFAJOR','CHURROS','FACTURAS','TIRAMISU','CHEESECAKE','PROFITEROL','ECLAIR','MACARON','CREPE','WAFFLE','STRUDEL','BAKLAVA','CANNOLI','MUFFIN','CUPCAKE','DONUT','GALLETITA','MERENGUE'] },
+  { nombre: 'Tecnología',   palabras: ['CELULAR','TABLET','COMPUTADORA','INTERNET','PANTALLA','TECLADO','MOUSE','IMPRESORA','CAMARA','AURICULAR','ALTAVOZ','ROUTER','CABLE','BATERIA','CARGADOR','MEMORIA','DISCO','PROCESADOR','MONITOR','ESCANER','PROYECTOR','MICROFONO','WEBCAM','PENDRIVE','SERVIDOR'] },
+  { nombre: 'Naturaleza',   palabras: ['MONTAÑA','RIO','LAGO','MAR','BOSQUE','SELVA','DESIERTO','PAMPA','GLACIAR','VOLCAN','CASCADA','CUEVA','ARRECIFE','PANTANO','SABANA','TUNDRA','PRADERA','ACANTILADO','PENINSULA','ISLA','DELTA','FIORDO','MESETA','LLANURA','VALLE'] },
+  { nombre: 'Judaísmo',     palabras: ['SHABBAT','TORÁ','SINAGOGA','MENORÁ','MEZUZÁ','KIPÁ','TALÍT','SHOFAR','JASIDUT','HALAJÁ','MITZVÁ','RABINO','SIDUR','KIDUSH','HAVDALÁ','PESAJ','SUCOT','JANUCÁ','PURIM','ROSHASHANA','YOMKIPUR','SHAVUOT','ISRAEL','JERUSALEM','KOTEL'] },
+  { nombre: 'Comidas judías', palabras: ['JALÁ','MATZÁ','GEFILTEFISH','KNISH','LATKE','KUGEL','TZIMES','CHOLENT','RUGELAJ','BABKA','HAMANTASH','SUFGANIYÁ','BOREKAS','HUMMUS','FALAFEL','SHAKSHUKA','TAHINI','BUREKAS','JACHNUN','MALAWAJ'] },
 ];
 
 const GRID_SIZE = 10;
@@ -73,6 +77,7 @@ function buildGrid(palabras: string[]) {
 export default function SopaScreen() {
   const insets = useSafeAreaInsets();
   const [temaIdx, setTemaIdx] = useState(0);
+  const temaListRef = useRef<FlatList>(null);
   const [grid, setGrid] = useState<string[][]>([]);
   const [placed, setPlaced] = useState<{ word: string; cells: [number,number][] }[]>([]);
   const [selecting, setSelecting] = useState<[number,number][]>([]);
@@ -83,7 +88,9 @@ export default function SopaScreen() {
 
   const initGame = useCallback((idx = temaIdx) => {
     const tema = TEMAS[idx];
-    const { grid: g, placed: p } = buildGrid(tema.palabras.slice(0, 6));
+    // Elegir 6 palabras al azar
+    const shuffled = [...tema.palabras].sort(() => Math.random() - 0.5);
+    const { grid: g, placed: p } = buildGrid(shuffled.slice(0, 6));
     setGrid(g);
     setPlaced(p);
     setSelecting([]);
@@ -98,26 +105,28 @@ export default function SopaScreen() {
 
   const handlePress = (r: number, c: number) => {
     if (won) return;
-    const key = cellKey(r, c);
     const already = selecting.findIndex(([sr, sc]) => sr === r && sc === c);
 
     let newSel: [number,number][];
     if (already >= 0) {
-      newSel = selecting.slice(0, already + 1);
+      // Deseleccionar si ya estaba marcada
+      newSel = selecting.filter((_, i) => i !== already);
     } else {
       newSel = [...selecting, [r, c]];
     }
     setSelecting(newSel);
 
-    // Verificar si forma una palabra
-    const selWord = newSel.map(([sr, sc]) => grid[sr][sc]).join('');
-    const match = placed.find(p =>
-      !found.includes(p.word) &&
-      (p.word === selWord || p.word === selWord.split('').reverse().join('')) &&
-      p.cells.length === newSel.length &&
-      p.cells.every(([pr, pc], i) => pr === newSel[i][0] && pc === newSel[i][1]) ||
-      (p.word === selWord && p.cells.length === newSel.length)
-    );
+    // Verificar si el conjunto de celdas seleccionadas coincide con alguna palabra
+    // (sin importar el orden en que se tocaron)
+    const selKeys = new Set(newSel.map(([sr, sc]) => cellKey(sr, sc)));
+    const match = placed.find(p => {
+      if (found.includes(p.word)) return false;
+      if (p.cells.length !== newSel.length) return false;
+      const wordKeys = new Set(p.cells.map(([pr, pc]) => cellKey(pr, pc)));
+      if (selKeys.size !== wordKeys.size) return false;
+      for (const k of selKeys) if (!wordKeys.has(k)) return false;
+      return true;
+    });
 
     if (match) {
       const newFound = [...found, match.word];
@@ -127,7 +136,7 @@ export default function SopaScreen() {
       setFoundCells(newFoundCells);
       setSelecting([]);
       if (newFound.length === placed.length) setWon(true);
-    } else if (newSel.length >= 10) {
+    } else if (newSel.length >= 12) {
       setSelecting([]);
     }
   };
@@ -137,20 +146,36 @@ export default function SopaScreen() {
   return (
     <View style={styles.container}>
       <AppHeader title="Sopa de letras" subtitle="Encontrá las palabras escondidas" showBack />
-      <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}>
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
+      >
 
         {/* Selector de tema */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.temaRow}>
-          {TEMAS.map((t, i) => (
+        <FlatList
+          ref={temaListRef}
+          data={TEMAS}
+          horizontal
+          keyExtractor={t => t.nombre}
+          showsHorizontalScrollIndicator={false}
+          style={styles.temaRow}
+          contentContainerStyle={{ paddingRight: Spacing.md }}
+          nestedScrollEnabled
+          renderItem={({ item: t, index: i }) => (
             <TouchableOpacity
               key={t.nombre}
               style={[styles.temaBtn, temaIdx === i && styles.temaBtnActive]}
-              onPress={() => setTemaIdx(i)}
+              onPress={() => {
+                setTemaIdx(i);
+                temaListRef.current?.scrollToIndex({ index: i, animated: true, viewPosition: 0.5 });
+              }}
             >
               <Text style={[styles.temaBtnText, temaIdx === i && styles.temaBtnTextActive]}>{t.nombre}</Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          )}
+        />
 
         {/* Palabras a encontrar */}
         <View style={styles.wordsRow}>
